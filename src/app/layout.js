@@ -15,7 +15,7 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "Astemari E-Learning",
+  title: "DAGULEARN",
   description:
     "The first well organised paid course sharing platform open for anyone ",
 };
@@ -33,6 +33,8 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Delicious+Handrawn&display=swap"
           rel="stylesheet"
         />
+
+        <link rel="icon" href="/favicon.ico" sizes="any" />
       </Head>
 
       <html lang="en">

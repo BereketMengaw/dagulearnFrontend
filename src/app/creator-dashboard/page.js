@@ -14,6 +14,7 @@ const CreatorDashboard = () => {
   const [userName, setUserName] = useState("Guest"); // State for user's name
   const router = useRouter();
   const [userData, setUserData] = useState(null);
+  const [userId, setuserId] = useState(null);
 
   useEffect(() => {
     // Ensure this code runs only on the client side
@@ -26,13 +27,14 @@ const CreatorDashboard = () => {
 
       const parsedUser = JSON.parse(storedUser);
       setUserName(parsedUser.name || "Guest"); // Set the user's name
+      setuserId(parsedUser.userId);
     }
   }, [router]); // Empty dependency array ensures it runs once when component mounts
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const creatorData = await fetchCreator(103); // Fetch creator data
+        const creatorData = await fetchCreator(userId); // Fetch creator data
         setUser(creatorData);
         console.log(creatorData);
       } catch (error) {
@@ -60,7 +62,6 @@ const CreatorDashboard = () => {
   useEffect(() => {
     // If creator check is done and user is not a creator or no creator data, redirect
     if (!checkingCreator && (creator === false || creator === null)) {
-      alert("First fill creator information.");
       router.push(
         `${process.env.NEXT_PUBLIC_APP_URL}/creator-dashboard/register`
       );

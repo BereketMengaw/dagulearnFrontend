@@ -84,10 +84,8 @@ const CreatorRegistrationForm = () => {
 
   useEffect(() => {
     if (!userData?.userId) {
-      alert("Only logged-in users can access this page.");
       router.push("/login");
     } else if (userData.role !== "creator") {
-      alert("You need to be a creator to access this page.");
       router.push("/"); // Redirect to homepage if not a creator
     }
   }, [userData, router]);
