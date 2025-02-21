@@ -84,23 +84,6 @@ const MyCourses = () => {
     loadCourses();
   }, [creatorId, userId]); // Add 'userId' as a dependency
 
-  // Fetch course details by chapter ID
-  const handleFetchCourseByChapter = async (chapterId) => {
-    try {
-      const course = await fetchCourseByChapterId(chapterId);
-      if (course && course.id) {
-        setChapterCourse(course);
-        setNoChaptersMessage(""); // Reset the backup message
-      } else {
-        setNoChaptersMessage("🚨 No chapters available for this course.");
-        setChapterCourse(null);
-      }
-    } catch (error) {
-      console.error("Failed to fetch course by chapter ID:", error);
-      setNoChaptersMessage("⚠️ Could not fetch chapters. Try again later.");
-    }
-  };
-
   return (
     <>
       <Navbar />

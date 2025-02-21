@@ -3,18 +3,18 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link"; // Import Link from next/link
 import Navbar from "@/components/Navbar/NavbarLogin";
 
 // Import images for different roles
 import Creator1 from "../../../../public/images/formFilling.png";
 import Creator2 from "../../../../public/images/addingCourse.png";
 import Creator3 from "../../../../public/images/sellingCourse.png";
-import Creator4 from "../../../../public/images/creator1.jpg";
+
 import Student1 from "../../../../public/images/going.png";
 import Student2 from "../../../../public/images/choosing.png";
 import Student3 from "../../../../public/images/learning.png";
 import DefaultImage from "../../../../public/images/creator1.jpg";
-import { Link } from "lucide-react";
 
 export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -37,12 +37,11 @@ const Signup = () => {
   };
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const creatorImages = [Creator1, Creator2, Creator3, Creator4];
+  const creatorImages = [Creator1, Creator2, Creator3];
   const creatorTexts = [
-    "Sign up or log in to get stparted.",
+    "Sign up or log in to get started.",
     "Register as a creator and verify your account.",
     "Upload your course content and set your pricing.",
-    "Start earning monthly from your courses!",
   ];
 
   const studentImages = [Student1, Student2, Student3];
@@ -52,26 +51,21 @@ const Signup = () => {
     "Enjoy learning and upgrading your skills.",
   ];
 
-  const handleNextImage = () => {
-    if (formData.role === "creator") {
-      setCurrentImageIndex(
-        (prevIndex) => (prevIndex + 1) % creatorImages.length
-      );
-    } else if (formData.role === "student") {
-      setCurrentImageIndex(
-        (prevIndex) => (prevIndex + 1) % studentImages.length
-      );
-    }
-  };
-
+  // Automatically cycle through steps
   useEffect(() => {
     const intervalId = setInterval(() => {
-      handleNextImage();
-    }, 4000); // Scroll every 4 seconds
+      setCurrentImageIndex((prevIndex) => {
+        if (formData.role === "creator") {
+          return (prevIndex + 1) % creatorImages.length;
+        } else if (formData.role === "student") {
+          return (prevIndex + 1) % studentImages.length;
+        }
+        return prevIndex;
+      });
+    }, 4000); // Change step every 4 seconds
 
-    // Cleanup the interval on component unmount
-    return () => clearInterval(intervalId);
-  }, [formData.role, handleNextImage]); // Include handleNextImage as a dependency
+    return () => clearInterval(intervalId); // Cleanup interval on unmount
+  }, [formData.role, creatorImages.length, studentImages.length]); // Added dependencies
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -123,8 +117,8 @@ const Signup = () => {
       <Navbar />
 
       <div className="flex h-screen">
-        {/* Left Side - Dynamic Hero Image Section */}
-        <div className="flex-1 hidden md:flex flex-col font-handwritten justify-center items-center p-8 bg-gray-100">
+        {/* Left Side - Dynamic Hero Image Section (Hidden on Small Screens) */}
+        <div className="flex-1 hidden md:flex flex-col justify-center items-center p-8 bg-gray-100">
           <h2 className="text-2xl font-bold mb-4">
             {formData.role === "creator"
               ? "How to Become a Creator"
@@ -132,17 +126,24 @@ const Signup = () => {
               ? "How to Start Learning"
               : "Welcome to Astemari"}
           </h2>
-          <Image
-            src={
-              formData.role === "creator"
-                ? creatorImages[currentImageIndex]
-                : formData.role === "student"
-                ? studentImages[currentImageIndex]
-                : DefaultImage
-            }
-            alt="Role-based Guide"
-            className="rounded-lg shadow-lg object-cover w-3/4 h-64  wavy-circle"
-          />
+
+          {/* Image Container */}
+          <div className="relative w-3/4 h-64 rounded-lg shadow-lg overflow-hidden border-2 border-gray-200">
+            <Image
+              src={
+                formData.role === "creator"
+                  ? creatorImages[currentImageIndex]
+                  : formData.role === "student"
+                  ? studentImages[currentImageIndex]
+                  : DefaultImage
+              }
+              alt="Role-based Guide"
+              className="object-cover w-full h-full"
+              priority
+            />
+          </div>
+
+          {/* Step Description */}
           <p className="text-lg text-center mt-4 px-6">
             {formData.role === "creator"
               ? creatorTexts[currentImageIndex]
@@ -150,6 +151,30 @@ const Signup = () => {
               ? studentTexts[currentImageIndex]
               : "Join Astemari and unlock learning and teaching opportunities."}
           </p>
+
+          {/* Progress Dots */}
+          <div className="flex mt-4 space-x-2">
+            {Array.from(
+              {
+                length:
+                  formData.role === "creator"
+                    ? creatorImages.length
+                    : formData.role === "student"
+                    ? studentImages.length
+                    : 1,
+              },
+              (_, index) => (
+                <div
+                  key={index}
+                  className={`w-3 h-3 rounded-full ${
+                    currentImageIndex === index
+                      ? "bg-indigo-600"
+                      : "bg-gray-300"
+                  }`}
+                />
+              )
+            )}
+          </div>
         </div>
 
         {/* Right Side - Signup Form */}

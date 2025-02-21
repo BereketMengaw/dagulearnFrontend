@@ -1,16 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 const ChapterDisplay = ({ courseId }) => {
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (courseId) {
-      fetchChapters();
-    }
-  }, [courseId, fetchChapters]); // Include fetchChapters in the dependency array
-
-  const fetchChapters = async () => {
+  const fetchChapters = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(
@@ -23,7 +17,13 @@ const ChapterDisplay = ({ courseId }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [courseId]); // Add `courseId` as a dependency
+
+  useEffect(() => {
+    if (courseId) {
+      fetchChapters();
+    }
+  }, [courseId, fetchChapters]); // Include `fetchChapters` in the dependency array
 
   if (loading) {
     return <p className="text-center">Loading chapters...</p>;

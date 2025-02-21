@@ -36,7 +36,7 @@ const Navbar = () => {
       <div className="flex items-center justify-between px-4 py-2 md:px-8">
         {/* Logo */}
         <div className="text-lg font-bold text-gray-800 flex-shrink-0 min-w-[100px]">
-          <Link href="/">DAGULEARN</Link>
+          <Link href="/">ASTEMARI</Link>
         </div>
 
         {/* Search Bar (Hidden on Small Screens) */}
@@ -52,9 +52,15 @@ const Navbar = () => {
         <div className="hidden md:flex items-center space-x-4">
           {userName !== "Guest" && (
             <div className="relative">
-              <button onClick={toggleDropdown} className="hover:text-blue-500">
-                Creator
-              </button>
+              {userData.role === "creator" && (
+                <button
+                  onClick={toggleDropdown}
+                  className="hover:text-blue-500"
+                >
+                  Creator
+                </button>
+              )}
+
               {isDropdownOpen && (
                 <div className="absolute right-0 top-full mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
                   <Link
@@ -168,12 +174,14 @@ const Navbar = () => {
             ) : (
               <>
                 {/* Creator Dropdown */}
-                <button
-                  onClick={toggleDropdown}
-                  className="hover:text-blue-500"
-                >
-                  Creator
-                </button>
+                {userData.role === "creator" && (
+                  <button
+                    onClick={toggleDropdown}
+                    className="hover:text-blue-500"
+                  >
+                    Creator
+                  </button>
+                )}
                 {isDropdownOpen && (
                   <div className="flex flex-col space-y-4 mt-2">
                     <Link

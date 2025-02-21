@@ -84,7 +84,7 @@ const CreatorRegistrationForm = () => {
 
   useEffect(() => {
     if (!userData?.userId) {
-      router.push("/login");
+      router.push("auth/login");
     } else if (userData.role !== "creator") {
       router.push("/"); // Redirect to homepage if not a creator
     }
@@ -111,8 +111,7 @@ const CreatorRegistrationForm = () => {
   }, [creator, userData]); // Add 'userData' as a dependency
 
   useEffect(() => {
-    if (!loading && creator == null) {
-      alert("Only logged-in users can access this page.");
+    if (!loading && !creator) {
       router.push("/creator-dashboard/notRegisterd");
     }
   }, [creator, loading, router]);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -8,7 +8,7 @@ const useChapterAndVideo = (courseId) => {
   const [errorMessage, setErrorMessage] = useState(""); // Store error message
 
   // Fetch chapters for the given course
-  const fetchChapters = async () => {
+  const fetchChapters = useCallback(async () => {
     if (!courseId) return;
     setIsLoading(true);
     setErrorMessage(""); // Clear previous errors
@@ -25,7 +25,7 @@ const useChapterAndVideo = (courseId) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [courseId]); // Add `courseId` as a dependency
 
   // Add a new chapter
   const addChapter = async (chapter) => {
@@ -89,7 +89,7 @@ const useChapterAndVideo = (courseId) => {
 
   useEffect(() => {
     fetchChapters();
-  }, [courseId, fetchChapters()]);
+  }, [courseId, fetchChapters]); // Add `fetchChapters` as a dependency
 
   return {
     chapters,

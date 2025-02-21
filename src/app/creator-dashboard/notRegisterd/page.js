@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Navbar } from "@material-tailwind/react";
+import Navbar from "../../../components/Navbar/Navbar.js";
 
 const CreatorRegistrationForm = () => {
   const router = useRouter();

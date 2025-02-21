@@ -42,8 +42,10 @@ const CreatorDashboard = () => {
       }
     };
 
-    fetchUserData();
-  }, [router]); // Run on mount to fetch creator data
+    if (userId) {
+      fetchUserData();
+    }
+  }, [userId, router]); // Added `userId` to the dependency array
 
   useEffect(() => {
     if (typeof window !== "undefined") {

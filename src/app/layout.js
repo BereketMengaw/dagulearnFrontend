@@ -18,6 +18,9 @@ export const metadata = {
   title: "DAGULEARN",
   description:
     "The first well organised paid course sharing platform open for anyone ",
+  icons: {
+    icon: "/favicon.ico", // or "/favicon.png"
+  },
 };
 
 export default function RootLayout({ children }) {

@@ -52,7 +52,7 @@ const ChapterAndVideoForm = () => {
     if (courseId && user) {
       fetchCourseInfo();
     }
-  }, [courseId, user?.userId, user?.role, router]); // Use specific user properties to prevent infinite loop
+  }, [courseId, user, router]); // Added `user` to the dependency array
 
   const handleChapterSelection = (e, type) => {
     const selectedChapterId = e.target.value;
