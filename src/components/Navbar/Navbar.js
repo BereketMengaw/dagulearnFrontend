@@ -9,9 +9,10 @@ const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isAvatarDropdownOpen, setIsAvatarDropdownOpen] = useState(false);
   const [userName, setUserName] = useState("Guest");
+  const [userData, setUserData] = useState();
 
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("user"));
+    setUserData = JSON.parse(localStorage.getItem("user"));
     if (userData && userData.name) {
       setUserName(userData.name);
     }
