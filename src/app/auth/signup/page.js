@@ -4,7 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link"; // Import Link from next/link
-import Navbar from "@/components/Navbar/NavbarLogin";
+import Navbar from "@/components/Navbar/Navbar";
 
 // Import images for different roles
 import Creator1 from "../../../../public/images/formFilling.png";

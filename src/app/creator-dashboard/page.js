@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Navbar from "@/components/Navbar/NavbarLogin";
+import Navbar from "@/components/Navbar/Navbar";
 import { fetchCreator } from "@/lib/fetcher"; // Import the fetcher function
 import useCheckCreator from "@/hooks/userCheckMiddleware"; // ✅ Import the middleware
 

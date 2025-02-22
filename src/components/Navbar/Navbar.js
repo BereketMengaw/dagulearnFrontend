@@ -9,12 +9,15 @@ const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isAvatarDropdownOpen, setIsAvatarDropdownOpen] = useState(false);
   const [userName, setUserName] = useState("Guest");
-  const [userData, setUserData] = useState();
+  const [userData, setUserData] = useState(null); // Initialize as null
 
   useEffect(() => {
-    setUserData = JSON.parse(localStorage.getItem("user"));
-    if (userData && userData.name) {
-      setUserName(userData.name);
+    // Fetch user data from localStorage
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUserData(parsedUser); // Set user data
+      setUserName(parsedUser.name || "Guest"); // Set user name
     }
   }, []);
 
@@ -51,21 +54,36 @@ const Navbar = () => {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-4">
-          {userName !== "Guest" && (
-            <div className="relative">
-              {userData.role === "creator" && (
-                <button
-                  onClick={toggleDropdown}
-                  className="hover:text-blue-500"
-                >
-                  Creator
-                </button>
-              )}
+          {/* Show login/signup buttons for guests */}
+          {!userData && (
+            <>
+              <Link
+                href="/auth/login"
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-300"
+              >
+                Login
+              </Link>
+              <Link
+                href="/auth/signup"
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-300 ml-4"
+              >
+                Signup
+              </Link>
+            </>
+          )}
 
+          {/* Show "Creator" button only for logged-in users with role "creator" */}
+          {userData && userData.role === "creator" && (
+            <div className="relative">
+              <button onClick={toggleDropdown} className="hover:text-blue-500">
+                Creator
+              </button>
+
+              {/* Creator Dropdown */}
               {isDropdownOpen && (
                 <div className="absolute right-0 top-full mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
                   <Link
-                    href="creator-dashboard/register"
+                    href="/creator-dashboard/register"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                   >
                     Register
@@ -86,28 +104,12 @@ const Navbar = () => {
               )}
             </div>
           )}
-          {userName === "Guest" && (
-            <>
-              <Link
-                href="auth/login"
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-300"
-              >
-                Login
-              </Link>
-              <Link
-                href="auth/signup"
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-300 ml-4"
-              >
-                Signup
-              </Link>
-            </>
-          )}
 
-          {/* Avatar Dropdown */}
-          <div className="relative flex items-center space-x-2">
-            <span className="text-gray-700">Hello, {userName}</span>
+          {/* Show "Hello, [Name]" and avatar dropdown for logged-in users */}
+          {userData && (
+            <div className="relative flex items-center space-x-2">
+              <span className="text-gray-700">Hello, {userName}</span>
 
-            {userName !== "Guest" && (
               <button
                 onClick={toggleAvatarDropdown}
                 className="focus:outline-none"
@@ -120,28 +122,30 @@ const Navbar = () => {
                   🧑‍🎓
                 </span>
               </button>
-            )}
 
-            {isAvatarDropdownOpen && userName !== "Guest" && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
-                <Link
-                  href="/dashboard"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                >
-                  Dashboard
-                </Link>
-                <button
-                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  onClick={() => {
-                    localStorage.removeItem("user");
-                    setUserName("Guest");
-                  }}
-                >
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
+              {/* Avatar Dropdown */}
+              {isAvatarDropdownOpen && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
+                  <Link
+                    href="/dashboard"
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    onClick={() => {
+                      localStorage.removeItem("user");
+                      setUserData(null); // Clear user data
+                      setUserName("Guest"); // Reset username
+                    }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -157,36 +161,39 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white shadow">
           <div className="flex flex-col items-center space-y-4 py-4">
-            {userName === "Guest" ? (
+            {/* Show login/signup buttons for guests */}
+            {!userData && (
               <>
                 <Link
-                  href="auth/login"
+                  href="/auth/login"
                   className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-300"
                 >
                   Login
                 </Link>
                 <Link
-                  href="auth/signup"
+                  href="/auth/signup"
                   className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-300"
                 >
                   Signup
                 </Link>
               </>
-            ) : (
+            )}
+
+            {/* Show "Creator" button only for logged-in users with role "creator" */}
+            {userData && userData.role === "creator" && (
               <>
+                <button
+                  onClick={toggleDropdown}
+                  className="hover:text-blue-500"
+                >
+                  Creator
+                </button>
+
                 {/* Creator Dropdown */}
-                {userData.role === "creator" && (
-                  <button
-                    onClick={toggleDropdown}
-                    className="hover:text-blue-500"
-                  >
-                    Creator
-                  </button>
-                )}
                 {isDropdownOpen && (
                   <div className="flex flex-col space-y-4 mt-2">
                     <Link
-                      href="creator-dashboard/register"
+                      href="/creator-dashboard/register"
                       className="hover:bg-gray-100 px-4 py-2"
                     >
                       Register
@@ -205,43 +212,49 @@ const Navbar = () => {
                     </Link>
                   </div>
                 )}
+              </>
+            )}
+
+            {/* Show "Hello, [Name]" and avatar dropdown for logged-in users */}
+            {userData && (
+              <div className="relative">
+                <span className="text-gray-700">Hello, {userName}</span>
+
+                <button
+                  onClick={toggleAvatarDropdown}
+                  className="focus:outline-none"
+                >
+                  <span
+                    role="img"
+                    aria-label="avatar"
+                    className="text-2xl bg-gray-200 rounded-full p-2 text-gray-800"
+                  >
+                    🧑‍🎓
+                  </span>
+                </button>
 
                 {/* Avatar Dropdown */}
-                <div className="relative">
-                  <button
-                    onClick={toggleAvatarDropdown}
-                    className="focus:outline-none"
-                  >
-                    <span
-                      role="img"
-                      aria-label="avatar"
-                      className="text-2xl bg-gray-200 rounded-full p-2 text-gray-800"
+                {isAvatarDropdownOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
+                    <Link
+                      href="/dashboard"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                     >
-                      🧑‍🎓
-                    </span>
-                  </button>
-
-                  {isAvatarDropdownOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
-                      <Link
-                        href="/dashboard"
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                      >
-                        Dashboard
-                      </Link>
-                      <button
-                        className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                        onClick={() => {
-                          localStorage.removeItem("user");
-                          setUserName("Guest");
-                        }}
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </>
+                      Dashboard
+                    </Link>
+                    <button
+                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      onClick={() => {
+                        localStorage.removeItem("user");
+                        setUserData(null); // Clear user data
+                        setUserName("Guest"); // Reset username
+                      }}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>

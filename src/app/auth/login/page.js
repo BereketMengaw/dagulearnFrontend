@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar/NavbarLogin";
+import Navbar from "@/components/Navbar/Navbar";
 import Image from "next/image";
 import Logo from "../../../../public/images/message.jpg";
 
