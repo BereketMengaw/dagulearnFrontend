@@ -20,6 +20,7 @@ export default function CourseCreate() {
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
   const [userData, setUserData] = useState();
+  const [creatorId, setCreatorId] = useState();
 
   // Retrieve user data from localStorage
 
@@ -86,7 +87,7 @@ export default function CourseCreate() {
       };
 
       // Step 1: Create Course
-      const response = await fetch(`${apiUrl}/courses/`, {
+      const response = await fetch(`${apiUrl}/api/courses/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+
 export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const useCheckCreator = (userId) => {
@@ -10,38 +11,39 @@ const useCheckCreator = (userId) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
+    let isMounted = true; // Track mount status
 
     const checkCreator = async () => {
       try {
         const response = await fetch(
-          ` ${process.env.NEXT_PUBLIC_API_URL}/api/creator/creators/${userId}`,
+          `${apiUrl}/api/creator/creators/${userId}`,
           {
             method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
           }
         );
 
         if (response.ok) {
           const data = await response.json();
-          if (data.creator) {
+          if (isMounted) {
             setCreator(data.creator);
+            console.log("Creator set:", data.creator);
+            console.log(creator, "this is the binyam");
           }
         }
       } catch (error) {
         console.error("Error checking creator:", error);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
     checkCreator();
-  }, [userId, router]);
+
+    return () => {
+      isMounted = false; // Cleanup function
+    };
+  }, [userId]);
 
   return { creator, loading };
 };

@@ -9,6 +9,7 @@ import { registerCreator, updateCreator } from "@/lib/api";
 import useCheckCreator from "@/hooks/userCheckMiddleware";
 import axios from "axios";
 export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+export const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
 const CreatorRegistrationForm = () => {
   const router = useRouter();
@@ -19,13 +20,17 @@ const CreatorRegistrationForm = () => {
 
   const [userData, setUserData] = useState(null);
 
+  const [isLoading, setIsLoading] = useState(true); // Add a loading state
+
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        setUserData(JSON.parse(storedUser));
-      }
+    // Fetch user data from localStorage
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      console.log(parsedUser, "this is the parsed user");
+      setUserData(parsedUser); // Set user data
     }
+    setIsLoading(false); // Mark loading as complete
   }, []);
 
   const educationLevels = [
@@ -83,12 +88,15 @@ const CreatorRegistrationForm = () => {
   ];
 
   useEffect(() => {
-    if (!userData?.userId) {
-      router.push("auth/login");
-    } else if (userData.role !== "creator") {
-      router.push("/"); // Redirect to homepage if not a creator
+    if (!isLoading) {
+      console.log(userData);
+      if (!userData?.userId) {
+        router.push(`${appUrl}/auth/login`);
+      } else if (userData.role !== "creator") {
+        router.push("/"); // Redirect to homepage if not a creator
+      }
     }
-  }, [userData, router]);
+  }, [userData, isLoading, router]);
 
   const { creator, loading } = useCheckCreator(userData?.userId);
 
@@ -182,7 +190,7 @@ const CreatorRegistrationForm = () => {
       formDataToSend.append("profilePicture", formData.profilePicture);
 
       const response = await axios.put(
-        `${apiUrl}/creator/creators/${creator.id}/profile-picture`,
+        `${apiUrl}/api/creator/creators/${creator.id}/profile-picture`,
         formDataToSend,
         {
           headers: {
@@ -228,7 +236,7 @@ const CreatorRegistrationForm = () => {
               <p className="font-bold mb-2">Profile Picture:</p>
               {creator.profilePicture && (
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_API_URL}${creator.profilePicture}`}
+                  src={`${apiUrl}${creator.profilePicture}`}
                   alt="Profile"
                   className="w-32 h-32 rounded-full object-cover border border-gray-300"
                 />
