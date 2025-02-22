@@ -140,11 +140,18 @@ export default function EarningsPage() {
       <Navbar />
       <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-white rounded-lg shadow-lg">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">My Earnings</h1>
-        {Object.keys(monthlyEarnings).length === 0 ? (
-          <p className="text-gray-500">No earnings found.</p>
-        ) : (
-          <div className="space-y-8">
-            {Object.entries(monthlyEarnings).map(([monthYear, data]) => (
+        <div className="space-y-8">
+          {Object.keys(monthlyEarnings).length === 0 ? (
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                No Earnings Found
+              </h2>
+              <p className="text-gray-500">
+                You have no earnings to display at this time.
+              </p>
+            </div>
+          ) : (
+            Object.entries(monthlyEarnings).map(([monthYear, data]) => (
               <div
                 key={monthYear}
                 className="bg-white p-6 rounded-lg shadow-md"
@@ -170,18 +177,18 @@ export default function EarningsPage() {
                     Total Earnings for {monthYear}: {data.total} ETB
                   </p>
                 </div>
-                <div className="flex justify-center">
-                  <button
-                    onClick={() => router.push("/creator-dashboard")}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition"
-                  >
-                    Back to Dashboard
-                  </button>
-                </div>
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
+        <div className="flex justify-center mt-10">
+          <button
+            onClick={() => router.push("/creator-dashboard")}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition"
+          >
+            Back to Dashboard
+          </button>
+        </div>
       </div>
     </>
   );

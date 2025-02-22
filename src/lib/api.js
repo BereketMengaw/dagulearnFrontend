@@ -138,6 +138,9 @@ export const updateCreator = async (userId, data) => {
       body: JSON.stringify(data),
     }
   );
+  if (response.ok) {
+    alert("creator information updated successfully ");
+  }
   if (!response.ok) {
     throw new Error("Failed to update creator data");
   }

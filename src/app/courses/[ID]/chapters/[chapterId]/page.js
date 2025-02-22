@@ -7,7 +7,6 @@ import {
   checkUserEnrollment,
 } from "@/lib/fetcher";
 import Navbar from "@/components/Navbar/Navbar";
-import Link from "next/link";
 
 const extractVideoId = (url) => {
   const regex =
@@ -20,7 +19,7 @@ export default function ChapterPage() {
   const params = useParams();
   const { ID: courseId, chapterId } = params || {};
   const [isTrueCreator, setIsTrueCreator] = useState();
-
+  const [selectedVideo, setSelectedVideo] = useState(null); // Track selected video for modal
   const [content, setContent] = useState({
     title: "",
     videos: [],
@@ -89,8 +88,6 @@ export default function ChapterPage() {
     loadContent();
   }, [courseId, chapterId]);
 
-  console.log(isTrueCreator, "is the data of true creator");
-
   if (!courseId || !chapterId) {
     return (
       <p className="text-center text-red-500 font-semibold mt-8">
@@ -101,9 +98,9 @@ export default function ChapterPage() {
 
   if (loading) {
     return (
-      <p className="text-center text-blue-500 font-semibold mt-8">
-        Loading chapter details...
-      </p>
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
     );
   }
 
@@ -111,7 +108,9 @@ export default function ChapterPage() {
     return (
       <>
         <Navbar />
-        <p className="text-center text-red-500 font-semibold mt-8">{error}</p>
+        <div className="flex justify-center items-center h-screen">
+          <p className="text-center text-red-500 font-semibold">{error}</p>
+        </div>
       </>
     );
   }
@@ -119,18 +118,16 @@ export default function ChapterPage() {
   return (
     <>
       <Navbar />
-      <div className="max-w-4xl mx-auto p-6 sm:p-8 bg-white rounded-lg shadow-lg space-y-8 mt-6">
-        <h1 className="text-3xl font-bold text-gray-800 text-center">
+      <div className="max-w-7xl mx-auto p-6 sm:p-8 bg-white rounded-lg shadow-lg space-y-8 mt-6">
+        <h1 className="text-4xl font-bold text-gray-800 text-center">
           {content.title}
         </h1>
 
         {/* Videos Section */}
         {content.videos.length > 0 && (
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-              Videos
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold text-gray-700">Videos</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {content.videos.map((video) => {
                 const embedUrl = extractVideoId(video.url)
                   ? `https://www.youtube.com/embed/${extractVideoId(video.url)}`
@@ -139,19 +136,23 @@ export default function ChapterPage() {
                 return (
                   <div
                     key={video.id}
-                    className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow"
+                    className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow cursor-pointer"
+                    onClick={() => setSelectedVideo(video)} // Open modal on click
                   >
                     <h3 className="text-xl font-medium text-gray-800 mb-2">
                       {video.title}
                     </h3>
                     {embedUrl ? (
-                      <iframe
-                        className="w-full h-56 rounded-lg"
-                        src={embedUrl}
-                        title={video.title}
-                        frameBorder="0"
-                        allowFullScreen
-                      ></iframe>
+                      <div className="aspect-w-16 aspect-h-9">
+                        <iframe
+                          className="w-full h-full rounded-lg"
+                          src={embedUrl}
+                          title={video.title}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        ></iframe>
+                      </div>
                     ) : (
                       <p className="text-center text-red-500">
                         Unable to load video
@@ -166,38 +167,104 @@ export default function ChapterPage() {
 
         {/* Links Section */}
         {Array.isArray(content.links) && content.links.length > 0 ? (
-          <div>
-            <h2 className="text-xl font-semibold mt-6">Links</h2>
-            {content.links.map((link) => (
-              <div
-                key={link.id || link.url}
-                className="mb-4 p-4 border rounded-md bg-gray-50"
-              >
-                <label className="block text-md font-medium">Link Title:</label>
-                <input
-                  type="text"
-                  value={link.title || "Untitled Link"}
-                  className="border p-2 rounded w-full"
-                  readOnly
-                />
-              </div>
-            ))}
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold text-gray-700">Links</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {content.links.map((link) => (
+                <div
+                  key={link.id || link.url}
+                  className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow"
+                >
+                  <h3 className="text-xl font-medium text-gray-800 mb-2">
+                    {link.title || "Untitled Link"}
+                  </h3>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 break-words"
+                  >
+                    {link.url}
+                  </a>
+                </div>
+              ))}
+            </div>
           </div>
         ) : (
           <p className="text-gray-500 text-lg">No links available</p>
         )}
+
+        {/* PDFs Section */}
+        {Array.isArray(content.pdfs) && content.pdfs.length > 0 ? (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold text-gray-700">PDFs</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {content.pdfs.map((pdf) => (
+                <div
+                  key={pdf.id || pdf.url}
+                  className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow"
+                >
+                  <h3 className="text-xl font-medium text-gray-800 mb-2">
+                    {pdf.title || "Untitled PDF"}
+                  </h3>
+                  <a
+                    href={pdf.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 break-words"
+                  >
+                    Download PDF
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p className="text-gray-500 text-lg">No PDFs available</p>
+        )}
+
+        {/* Edit Button for Creator */}
+        {isTrueCreator && (
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={() =>
+                (window.location.href = `http://localhost:3000/courses/${courseId}/chapters/${chapterId}/edit`)
+              }
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
+            >
+              Go to Edit Page
+            </button>
+          </div>
+        )}
       </div>
-      {isTrueCreator ? (
-        <button
-          onClick={() =>
-            (window.location.href = `http://localhost:3000/courses/${courseId}/chapters/${chapterId}/edit`)
-          }
-          className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-        >
-          Go to Edit Page
-        </button>
-      ) : (
-        <></>
+
+      {/* Video Modal */}
+      {selectedVideo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl">
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">
+              {selectedVideo.title}
+            </h3>
+            <div className="aspect-w-16 aspect-h-9">
+              <iframe
+                className="w-full h-full rounded-lg"
+                src={`https://www.youtube.com/embed/${extractVideoId(
+                  selectedVideo.url
+                )}`}
+                title={selectedVideo.title}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            <button
+              onClick={() => setSelectedVideo(null)} // Close modal
+              className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200"
+            >
+              Close
+            </button>
+          </div>
+        </div>
       )}
     </>
   );

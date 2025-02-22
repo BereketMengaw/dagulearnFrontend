@@ -17,9 +17,7 @@ const CreatorRegistrationForm = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
-
   const [userData, setUserData] = useState(null);
-
   const [isLoading, setIsLoading] = useState(true); // Add a loading state
 
   useEffect(() => {
@@ -33,14 +31,7 @@ const CreatorRegistrationForm = () => {
     setIsLoading(false); // Mark loading as complete
   }, []);
 
-  const educationLevels = [
-    "Certificate",
-    "Diploma",
-    "Bachelor's Degree",
-    "Master's Degree",
-    "PhD",
-    "Postgraduate",
-  ];
+  const educationLevels = ["High School", "Bachelor", "Master", "PhD", "Other"];
 
   const banksInEthiopia = [
     "Commercial Bank of Ethiopia",
@@ -111,7 +102,7 @@ const CreatorRegistrationForm = () => {
         experience: creator.experience || "",
         skills: creator.skills || "",
         location: creator.location || "",
-        socialLinks: { linkedin: creator.socialLinks?.linkedin || "" },
+        socialLinks: JSON.stringify({ telegram: "t.me" }), // Convert object to JSON string
         bankType: creator.bankType || "",
         bankAccount: creator.bankAccount || "",
       });
@@ -121,7 +112,6 @@ const CreatorRegistrationForm = () => {
   useEffect(() => {
     console.log("Creator:", creator);
     console.log("Loading:", loading);
-    console.log("User Data:", userData);
 
     if (!loading && (creator === null || creator === undefined)) {
       console.log("Redirecting to /creator-dashboard/notRegisterd");
@@ -239,6 +229,7 @@ const CreatorRegistrationForm = () => {
                   src={`${apiUrl}${creator.profilePicture}`}
                   alt="Profile"
                   className="w-32 h-32 rounded-full object-cover border border-gray-300"
+                  unoptimized
                 />
               )}
             </div>
@@ -269,10 +260,6 @@ const CreatorRegistrationForm = () => {
               </p>
 
               <p>
-                <strong>SocalMedia Adress:</strong> {creator.linkedin}
-              </p>
-
-              <p>
                 <strong>Bank Name:</strong> {creator.bankType}
               </p>
 
@@ -287,9 +274,9 @@ const CreatorRegistrationForm = () => {
             >
               Edit Profile
             </button>
-            <div className="flex justify-center items-center py-4 bg-gray-100">
+            <div className="flex justify-center items-center mt-3">
               <Link href="/creator-dashboard">
-                <button className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 ease-in-out">
+                <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold rounded-lg shadow-lg hover:from-blue-700 hover:to-blue-600 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                   Go to Creator Dashboard
                 </button>
               </Link>
@@ -372,6 +359,8 @@ const CreatorRegistrationForm = () => {
                   className="w-full p-2 border rounded-md"
                 />
 
+                {/* Social Links Input */}
+
                 <select
                   name="bankType"
                   value={formData?.bankType || ""}
@@ -404,11 +393,13 @@ const CreatorRegistrationForm = () => {
               </form>
 
               {/* Bottom button with link */}
-              <Link href="/creator-dashboard">
-                <button className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 ease-in-out">
-                  Go to Creator Dashboard
-                </button>
-              </Link>
+              <div className="flex justify-center items-center  mt-3">
+                <Link href="/creator-dashboard">
+                  <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold rounded-lg shadow-lg hover:from-blue-700 hover:to-blue-600 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    Go to Creator Dashboard
+                  </button>
+                </Link>
+              </div>
             </div>
 
             {/* Profile Picture Section */}
@@ -424,6 +415,7 @@ const CreatorRegistrationForm = () => {
                     }
                     alt="Profile Preview"
                     className="w-32 h-32 rounded-full object-cover border border-gray-300"
+                    unoptimized
                   />
                 )}
                 <input

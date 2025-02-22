@@ -2,7 +2,7 @@
 export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 export const addLink = async (linkData) => {
   try {
-    const response = await fetch(`${apiUrl}/link/`, {
+    const response = await fetch(`${apiUrl}/api/link/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

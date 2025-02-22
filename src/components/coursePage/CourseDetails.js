@@ -208,58 +208,79 @@ export default function CourseDetails({ course, chapters }) {
     <div className="min-h-screen bg-gradient-to-r from-blue-50 to-indigo-100 py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* User and Creator Info Section */}
-        <div className="bg-white p-6 rounded-xl shadow-md mb-6 flex items-center">
+
+        <div className="bg-white p-8 rounded-xl shadow-lg mb-6 flex flex-col md:flex-row items-start space-y-6 md:space-y-0 md:space-x-8">
           {/* Profile Picture on the Left */}
           {creator?.profilePicture && (
-            <div className="w-32 h-32 mr-6 flex-shrink-0">
+            <div className="w-32 h-32 flex-shrink-0">
               <Image
                 src={`${process.env.NEXT_PUBLIC_API_URL}${creator.profilePicture}`}
                 alt="Profile"
-                className="w-full h-full rounded-full object-cover border border-gray-300"
+                width={128}
+                height={128}
+                className="w-full h-full rounded-full object-cover border-4 border-white shadow-md"
               />
             </div>
           )}
 
           {/* Creator Information on the Right */}
-          <div className="flex flex-col justify-center flex-grow">
+          <div className="flex flex-col justify-center flex-grow space-y-4">
             {user && (
-              <div className="mb-4">
-                <h2 className="text-lg font-semibold text-gray-800 mb-2">
-                  About creator
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                  About Creator
                 </h2>
-                <p className="text-gray-600">
-                  <span className="font-medium">Name:</span> {name}
-                </p>
-                <p className="text-gray-600">
-                  <span className="font-medium">Email:</span> {gmail}
-                </p>
+                <div className="space-y-2">
+                  <p className="text-gray-700">
+                    <span className="font-semibold">Name:</span> {name}
+                  </p>
+                  <p className="text-gray-700">
+                    <span className="font-semibold">Email:</span>{" "}
+                    <a
+                      href={`mailto:${gmail}`}
+                      className="text-blue-600 hover:underline"
+                    >
+                      {gmail}
+                    </a>
+                  </p>
+                </div>
               </div>
             )}
 
             {creator && (
-              <div>
-                <p className="text-gray-600">
-                  <span className="font-medium">Experience:</span>{" "}
-                  {creator.experience}
-                </p>
-                <p className="text-gray-600">
-                  <span className="font-medium">Creator Bio:</span>{" "}
-                  {creator.bio}
-                </p>
-                <p className="text-gray-600">
-                  <span className="font-medium">Education Level:</span>{" "}
-                  {creator.educationLevel}
-                </p>
-                <p className="text-gray-600">
-                  <span className="font-medium">Skills:</span> {creator.skills}
-                </p>
-                <p className="text-gray-600">
-                  <span className="font-medium">Location:</span>{" "}
-                  {creator.location}
-                </p>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <p className="text-gray-700">
+                    <span className="font-semibold">Experience:</span>{" "}
+                    {creator.experience} years
+                  </p>
+                  <p className="text-gray-700">
+                    <span className="font-semibold">Education Level:</span>{" "}
+                    {creator.educationLevel}
+                  </p>
+                  <p className="text-gray-700">
+                    <span className="font-semibold">Skills:</span>{" "}
+                    {creator.skills}
+                  </p>
+                  <p className="text-gray-700">
+                    <span className="font-semibold">Location:</span>{" "}
+                    {creator.location}
+                  </p>
+                </div>
+
+                {/* Bio Section */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="text-gray-700">
+                    <span className="font-semibold">Bio:</span> {creator.bio}
+                  </p>
+                </div>
+
+                {/* Social Links */}
                 {creator.socialLinks?.linkedin && (
-                  <p className="text-gray-600">
-                    <span className="font-medium">LinkedIn:</span>{" "}
+                  <div className="flex items-center space-x-2">
+                    <span className="font-semibold text-gray-700">
+                      LinkedIn:
+                    </span>
                     <a
                       href={creator.socialLinks.linkedin}
                       target="_blank"
@@ -268,7 +289,7 @@ export default function CourseDetails({ course, chapters }) {
                     >
                       View Profile
                     </a>
-                  </p>
+                  </div>
                 )}
               </div>
             )}

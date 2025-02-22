@@ -6,6 +6,8 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { fetchContentByChapterAndCourse } from "@/lib/fetcher";
 import Navbar from "@/components/Navbar/Navbar";
+import { apiUrl } from "@/lib/api";
+import { appUrl } from "@/app/creator-dashboard/register/page";
 
 export default function UpdateChapterPage() {
   const params = useParams();
@@ -92,12 +94,9 @@ export default function UpdateChapterPage() {
 
   const handleDeleteVideo = async (videoId) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/videos/${videoId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/videos/${videoId}`, {
+        method: "DELETE",
+      });
 
       if (!response.ok) throw new Error("Failed to delete video.");
 
@@ -113,7 +112,7 @@ export default function UpdateChapterPage() {
 
   const handleDeleteLink = async (linkId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/link/${linkId}`, {
+      const response = await fetch(`${apiUrl}/api/link/${linkId}`, {
         method: "DELETE",
       });
 
@@ -132,7 +131,7 @@ export default function UpdateChapterPage() {
   const handleUpdateChapter = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/chapters/${courseId}/chapters/order/${chapterId}.`,
+        `${apiUrl}/api/chapters/${courseId}/chapters/order/${chapterId}.`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -148,14 +147,11 @@ export default function UpdateChapterPage() {
 
   const handleUpdateVideo = async (videoId, updatedTitle, updatedUrl) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/videos/${videoId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ title: updatedTitle, url: updatedUrl }),
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/videos/${videoId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: updatedTitle, url: updatedUrl }),
+      });
       alert("you have successfully updated the video");
       if (!response.ok) throw new Error("Failed to update video.");
     } catch (err) {
@@ -165,7 +161,7 @@ export default function UpdateChapterPage() {
 
   const handleUpdateLink = async (linkId, updatedTitle, updatedUrl) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/link/${linkId}`, {
+      const response = await fetch(`${apiUrl}/api/link/${linkId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: updatedTitle, url: updatedUrl }),
@@ -179,9 +175,7 @@ export default function UpdateChapterPage() {
   };
 
   const handleNavigateToAddChapter = () => {
-    router.push(
-      `http://localhost:3000/creator-dashboard/${courseId}/create-chapters`
-    );
+    router.push(`${appUrl}/creator-dashboard/${courseId}/create-chapters`);
   };
 
   if (loading) return <p>Loading...</p>;
@@ -316,9 +310,7 @@ export default function UpdateChapterPage() {
       <div className="flex justify-center p-23">
         <button
           onClick={() =>
-            router.push(
-              `http://localhost:3000/courses/${courseId}/chapters/${chapterId}`
-            )
+            router.push(`${appUrl}/courses/${courseId}/chapters/${chapterId}`)
           }
           className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 my-7 px-6 rounded-lg transition"
         >

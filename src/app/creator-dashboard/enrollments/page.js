@@ -147,14 +147,15 @@ export default function EnrollmentsPage() {
         <h1 className="text-3xl font-bold mb-6 text-gray-800">
           My Course Enrollments
         </h1>
-        {enrollments.length === 0 ? (
-          <p className="text-gray-500">
-            No enrollments found for your courses.
-          </p>
-        ) : (
-          <div className="space-y-8">
-            {enrollments.map(({ course, enrollments }) => {
-              const courseEarnings = enrollments.reduce(
+        <div className="space-y-8">
+          {courses.length === 0 ? (
+            <p className="text-gray-500">No courses found.</p>
+          ) : (
+            courses.map((course) => {
+              const courseEnrollments =
+                enrollments.find((e) => e.course.id === course.id)
+                  ?.enrollments || [];
+              const courseEarnings = courseEnrollments.reduce(
                 (sum, enrollment) =>
                   sum + parseFloat(enrollment.course.price || 0),
                 0
@@ -185,7 +186,7 @@ export default function EnrollmentsPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {enrollments.length === 0 ? (
+                        {courseEnrollments.length === 0 ? (
                           <tr>
                             <td
                               colSpan="3"
@@ -195,7 +196,7 @@ export default function EnrollmentsPage() {
                             </td>
                           </tr>
                         ) : (
-                          enrollments.map((enrollment) => (
+                          courseEnrollments.map((enrollment) => (
                             <tr
                               key={enrollment.id}
                               className="border-b hover:bg-gray-50 transition duration-200"
@@ -220,14 +221,14 @@ export default function EnrollmentsPage() {
                   </div>
                 </div>
               );
-            })}
-            <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-              <div className="text-lg font-bold text-blue-800">
-                Total Earnings from All Courses: {totalEarnings} ETB
-              </div>
+            })
+          )}
+          <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+            <div className="text-lg font-bold text-blue-800">
+              Total Earnings from All Courses: {totalEarnings} ETB
             </div>
           </div>
-        )}
+        </div>
         <div className="mt-10 flex justify-center">
           <button
             onClick={() => router.push("/creator-dashboard")}

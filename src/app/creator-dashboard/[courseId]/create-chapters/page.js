@@ -29,12 +29,9 @@ const ChapterAndVideoForm = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-
     const fetchCourseInfo = async () => {
+      if (!user) return; // Stop if user is not available
+
       try {
         const response = await fetch(`${apiUrl}/api/courses/${courseId}`);
         const courseData = await response.json();
@@ -49,10 +46,10 @@ const ChapterAndVideoForm = () => {
       }
     };
 
-    if (courseId && user) {
+    if (courseId) {
       fetchCourseInfo();
     }
-  }, [courseId, user, router]); // Added `user` to the dependency array
+  }, [courseId, user, router]);
 
   const handleChapterSelection = (e, type) => {
     const selectedChapterId = e.target.value;

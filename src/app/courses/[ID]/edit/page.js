@@ -86,7 +86,7 @@ export default function EditCoursePage() {
       const formData = new FormData();
       formData.append("thumbnail", selectedImage);
 
-      const uploadRes = await fetch(`${apiUrl}/courses/${Id}/thumbnail`, {
+      const uploadRes = await fetch(`${apiUrl}/api/courses/${Id}/thumbnail`, {
         method: "POST",
         body: formData,
       });
@@ -104,7 +104,7 @@ export default function EditCoursePage() {
       thumbnail: uploadedImageUrl,
     };
 
-    const res = await fetch(`${apiUrl}/courses/${Id}`, {
+    const res = await fetch(`${apiUrl}/api/courses/${Id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedData),
@@ -128,7 +128,7 @@ export default function EditCoursePage() {
       return;
     }
 
-    const res = await fetch(`${apiUrl}/courses/${Id}`, {
+    const res = await fetch(`${apiUrl}/api/courses/${Id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     });
@@ -199,6 +199,7 @@ export default function EditCoursePage() {
                   src={imagePreview || course.thumbnail}
                   alt="Thumbnail"
                   className="w-full h-40 object-cover mb-2 rounded"
+                  unoptimized
                 />
               ) : null}
               <input

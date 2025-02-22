@@ -28,7 +28,6 @@ const useCheckCreator = (userId) => {
           if (isMounted) {
             setCreator(data.creator);
             console.log("Creator set:", data.creator);
-            console.log(creator, "this is the binyam");
           }
         }
       } catch (error) {
