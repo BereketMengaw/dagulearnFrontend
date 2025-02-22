@@ -111,8 +111,12 @@ const CreatorRegistrationForm = () => {
   }, [creator, userData]); // Add 'userData' as a dependency
 
   useEffect(() => {
-    // Only redirect if loading is complete and creator is explicitly null or undefined
+    console.log("Creator:", creator);
+    console.log("Loading:", loading);
+    console.log("User Data:", userData);
+
     if (!loading && (creator === null || creator === undefined)) {
+      console.log("Redirecting to /creator-dashboard/notRegisterd");
       router.push("/creator-dashboard/notRegisterd");
     }
   }, [creator, loading, router]);
