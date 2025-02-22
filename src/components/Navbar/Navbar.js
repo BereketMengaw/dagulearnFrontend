@@ -40,7 +40,7 @@ const Navbar = () => {
       <div className="flex items-center justify-between px-4 py-2 md:px-8">
         {/* Logo */}
         <div className="text-lg font-bold text-gray-800 flex-shrink-0 min-w-[100px]">
-          <Link href="/">ASTEMARI</Link>
+          <Link href="/">DAGULEARN</Link>
         </div>
 
         {/* Search Bar (Hidden on Small Screens) */}

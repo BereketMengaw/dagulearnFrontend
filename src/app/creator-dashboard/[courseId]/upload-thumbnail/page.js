@@ -28,10 +28,13 @@ export default function UploadThumbnail() {
     formData.append("thumbnail", thumbnail);
 
     try {
-      const response = await fetch(`${apiUrl}/courses/${courseId}/thumbnail`, {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        `${apiUrl}/api/courses/${courseId}/thumbnail`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to upload thumbnail.");

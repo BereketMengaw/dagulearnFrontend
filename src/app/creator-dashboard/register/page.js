@@ -269,8 +269,13 @@ const CreatorRegistrationForm = () => {
               </p>
 
               <p>
+                <strong>SocalMedia Adress:</strong> {creator.linkedin}
+              </p>
+
+              <p>
                 <strong>Bank Name:</strong> {creator.bankType}
               </p>
+
               <p>
                 <strong>Bank Account:</strong> {creator.bankAccount}
               </p>
