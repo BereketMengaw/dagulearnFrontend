@@ -105,7 +105,7 @@ export const fetchCourses = async () => {
 export const fetchEnrollmentsCount = async (courseId) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/enrollments/count/${courseId}`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/enrollments/counts/${courseId}`
     );
     if (!response.ok) throw new Error("Failed to fetch enrollment count");
 

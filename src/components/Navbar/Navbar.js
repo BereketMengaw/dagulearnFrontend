@@ -44,13 +44,6 @@ const Navbar = () => {
         </div>
 
         {/* Search Bar (Hidden on Small Screens) */}
-        <div className="hidden md:flex flex-grow mx-4">
-          <input
-            type="text"
-            placeholder="Search for anything"
-            className="w-40 px-4 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-4">
