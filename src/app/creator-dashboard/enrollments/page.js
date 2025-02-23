@@ -81,21 +81,35 @@ export default function EnrollmentsPage() {
         const enrollmentsData = [];
         let total = 0;
         for (const course of courses) {
-          const response = await fetch(
-            `${apiUrl}/api/enrollments/course/${course.id}`
-          );
-          if (!response.ok)
-            throw new Error(
-              "THERE IS NO ENROLLMENT FOR THE COURSES UNTIL NOW "
+          console.log(`Fetching enrollments for course: ${course.id}`);
+          try {
+            const response = await fetch(
+              `${apiUrl}/api/enrollments/course/${course.id}`
             );
-          const data = await response.json();
-          enrollmentsData.push({ course, enrollments: data });
+            if (!response.ok) {
+              console.error(
+                `Failed to fetch enrollments for course ${course.id}:`,
+                response.statusText
+              );
+              continue;
+            }
 
-          const courseEarnings = data.reduce(
-            (sum, enrollment) => sum + parseFloat(enrollment.course.price || 0),
-            0
-          );
-          total += courseEarnings;
+            const data = await response.json();
+            console.log(`Enrollments for course ${course.id}:`, data);
+            enrollmentsData.push({ course, enrollments: data });
+
+            const courseEarnings = data.reduce(
+              (sum, enrollment) =>
+                sum + parseFloat(enrollment.course.price || 0),
+              0
+            );
+            total += courseEarnings;
+          } catch (err) {
+            console.error(
+              `Error fetching enrollments for course ${course.id}:`,
+              err.message
+            );
+          }
         }
         setEnrollments(enrollmentsData);
         setTotalEarnings(total);
