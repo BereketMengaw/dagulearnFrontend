@@ -28,6 +28,8 @@ const CourseCard = ({ course, isTopSeller }) => {
     ? `${process.env.NEXT_PUBLIC_API_URL}${course.thumbnail}`
     : "/placeholder-thumbnail.jpg"; // Placeholder for no image
 
+  console.log(`${process.env.NEXT_PUBLIC_API_URL}${course.thumbnail}`);
+
   return (
     <div className="group relative max-w-xs mx-auto bg-white border border-gray-200 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden">
       {/* Wrap entire card with Link to prevent nested <a> tags */}
