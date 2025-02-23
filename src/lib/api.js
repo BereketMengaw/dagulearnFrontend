@@ -3,7 +3,7 @@ export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 // api.js - For managing requests
 export const signUp = async (phoneNumber, password) => {
-  const res = await fetch(`${apiUrl}/auth/signup`, {
+  const res = await fetch(`${apiUrl}/api/auth/signup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -15,7 +15,7 @@ export const signUp = async (phoneNumber, password) => {
 };
 
 export const signIn = async (phoneNumber, password) => {
-  const res = await fetch(`${apiUrl}/auth/signin`, {
+  const res = await fetch(`${apiUrl}/api/auth/signin`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -29,7 +29,7 @@ export const signIn = async (phoneNumber, password) => {
 export const fetchEnrollmentsCount = async (courseId) => {
   try {
     const response = await axios.get(
-      `${apiUrl}/enrollments/counts/${courseId}`
+      `${apiUrl}/api/enrollments/counts/${courseId}`
     );
     return response.data;
   } catch (error) {
@@ -54,7 +54,7 @@ export const addChapterToAPI = async (chapter, courseId) => {
 };
 
 export const addVideoToAPI = async (video, chapterId, courseId) => {
-  const response = await fetch(`${apiUrl}/videos/${courseId}`, {
+  const response = await fetch(`${apiUrl}/api/videos/${courseId}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ title: video.title, url: video.url, chapterId }),
@@ -65,7 +65,9 @@ export const addVideoToAPI = async (video, chapterId, courseId) => {
 
 export async function fetchEnrollments(courseId) {
   try {
-    const response = await fetch(`${apiUrl}/enrollments/course/${courseId}`);
+    const response = await fetch(
+      `${apiUrl}/api/enrollments/course/${courseId}`
+    );
     if (!response.ok) throw new Error("Failed to fetch enrollments");
     return await response.json();
   } catch (error) {
@@ -97,7 +99,7 @@ export const registerCreator = async (formData) => {
   }
 
   try {
-    const response = await fetch(`${apiUrl}/creator/creators`, {
+    const response = await fetch(`${apiUrl}/api/creator/creators`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`, // Send token in the request
