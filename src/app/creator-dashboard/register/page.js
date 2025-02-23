@@ -284,6 +284,37 @@ const CreatorRegistrationForm = () => {
           </div>
         ) : (
           <div className="space-y-6">
+            {/* Profile Picture Section */}
+            <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
+              <h3 className="text-xl font-semibold mb-4">Profile Picture</h3>
+              <div className="flex flex-col items-center space-y-4">
+                {formData?.profilePicture && (
+                  <Image
+                    src={
+                      typeof formData.profilePicture === "string"
+                        ? formData.profilePicture
+                        : URL.createObjectURL(formData.profilePicture)
+                    }
+                    alt="Profile Preview"
+                    className="w-32 h-32 rounded-full object-cover border border-gray-300"
+                    unoptimized
+                  />
+                )}
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  className="w-full p-2 border rounded-md"
+                />
+                <button
+                  type="button"
+                  onClick={handleUpdateProfilePicture}
+                  className="w-full md:w-auto px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Uploading..." : "Update Profile Picture"}
+                </button>
+              </div>
+            </div>
             {/* Profile Information Section */}
             <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
               <h3 className="text-xl font-semibold mb-4">
@@ -399,38 +430,6 @@ const CreatorRegistrationForm = () => {
                     Go to Creator Dashboard
                   </button>
                 </Link>
-              </div>
-            </div>
-
-            {/* Profile Picture Section */}
-            <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold mb-4">Profile Picture</h3>
-              <div className="flex flex-col items-center space-y-4">
-                {formData?.profilePicture && (
-                  <Image
-                    src={
-                      typeof formData.profilePicture === "string"
-                        ? formData.profilePicture
-                        : URL.createObjectURL(formData.profilePicture)
-                    }
-                    alt="Profile Preview"
-                    className="w-32 h-32 rounded-full object-cover border border-gray-300"
-                    unoptimized
-                  />
-                )}
-                <input
-                  type="file"
-                  onChange={handleFileChange}
-                  className="w-full p-2 border rounded-md"
-                />
-                <button
-                  type="button"
-                  onClick={handleUpdateProfilePicture}
-                  className="w-full md:w-auto px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Uploading..." : "Update Profile Picture"}
-                </button>
               </div>
             </div>
           </div>
