@@ -124,8 +124,8 @@ export default function CourseDetails({ course, chapters }) {
 
   const handleBuy = async () => {
     if (!user) {
-      setButtonMessage("You need to login or signup to buy this course.");
-      setTimeout(() => setButtonMessage("Buy Now"), 3000);
+      setButtonMessage("You need to login/signup  to buy this course.");
+      setTimeout(() => setButtonMessage("Buy Now"), 5000);
       return;
     }
 

@@ -7,6 +7,7 @@ import {
   checkUserEnrollment,
 } from "@/lib/fetcher";
 import Navbar from "@/components/Navbar/Navbar";
+import { appUrl } from "@/app/creator-dashboard/register/page";
 
 const extractVideoId = (url) => {
   const regex =
@@ -127,40 +128,44 @@ export default function ChapterPage() {
         {content.videos.length > 0 && (
           <div className="space-y-6">
             <h2 className="text-2xl font-semibold text-gray-700">Videos</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {content.videos.map((video) => {
-                const embedUrl = extractVideoId(video.url)
-                  ? `https://www.youtube.com/embed/${extractVideoId(video.url)}`
-                  : null;
+            <div className="flex justify-center">
+              <div className="w-full lg:w-3/4 xl:w-2/3">
+                {content.videos.map((video) => {
+                  const embedUrl = extractVideoId(video.url)
+                    ? `https://www.youtube.com/embed/${extractVideoId(
+                        video.url
+                      )}`
+                    : null;
 
-                return (
-                  <div
-                    key={video.id}
-                    className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow cursor-pointer"
-                    onClick={() => setSelectedVideo(video)} // Open modal on click
-                  >
-                    <h3 className="text-xl font-medium text-gray-800 mb-2">
-                      {video.title}
-                    </h3>
-                    {embedUrl ? (
-                      <div className="aspect-w-16 aspect-h-9">
-                        <iframe
-                          className="w-full h-full rounded-lg"
-                          src={embedUrl}
-                          title={video.title}
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        ></iframe>
-                      </div>
-                    ) : (
-                      <p className="text-center text-red-500">
-                        Unable to load video
-                      </p>
-                    )}
-                  </div>
-                );
-              })}
+                  return (
+                    <div
+                      key={video.id}
+                      className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow cursor-pointer"
+                      onClick={() => setSelectedVideo(video)} // Open modal on click
+                    >
+                      <h3 className="text-xl font-medium text-gray-800 mb-2">
+                        {video.title}
+                      </h3>
+                      {embedUrl ? (
+                        <div className="aspect-w-16 aspect-h-9">
+                          <iframe
+                            className="w-full h-full rounded-lg"
+                            src={embedUrl}
+                            title={video.title}
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          ></iframe>
+                        </div>
+                      ) : (
+                        <p className="text-center text-red-500">
+                          Unable to load video
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
@@ -228,7 +233,7 @@ export default function ChapterPage() {
           <div className="flex justify-center mt-8">
             <button
               onClick={() =>
-                (window.location.href = `http://localhost:3000/courses/${courseId}/chapters/${chapterId}/edit`)
+                (window.location.href = `${appUrl}/courses/${courseId}/chapters/${chapterId}/edit`)
               }
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
             >
