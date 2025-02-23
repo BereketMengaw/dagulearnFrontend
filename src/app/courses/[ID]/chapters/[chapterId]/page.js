@@ -129,7 +129,7 @@ export default function ChapterPage() {
           <div className="space-y-6">
             <h2 className="text-2xl font-semibold text-gray-700">Videos</h2>
             <div className="flex justify-center">
-              <div className="w-full lg:w-3/4 xl:w-2/3">
+              <div className="w-full lg:w-3/4 xl:w-2/3 h-screen">
                 {content.videos.map((video) => {
                   const embedUrl = extractVideoId(video.url)
                     ? `https://www.youtube.com/embed/${extractVideoId(
