@@ -28,20 +28,20 @@ const CourseCard = ({ course, isTopSeller }) => {
     ? `${process.env.NEXT_PUBLIC_API_URL}${course.thumbnail}`
     : "/placeholder-thumbnail.jpg"; // Placeholder for no image
 
+  console.log(`${process.env.NEXT_PUBLIC_API_URL}${course.thumbnail}`);
+
   return (
-    <div className="group w-64 sm:w-72 md:w-80 h-[360px] sm:h-[400px] bg-white border border-gray-200 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
+    <div className="group relative max-w-xs mx-auto bg-white border border-gray-200 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden">
       {/* Wrap entire card with Link to prevent nested <a> tags */}
       <Link href={`/${course.title}`} passHref>
-        <div className="block flex-1 flex flex-col">
+        <div className="block">
           {/* Thumbnail Section */}
-          <div className="relative h-40 sm:h-48 w-full overflow-hidden">
+          <div className="relative overflow-hidden rounded-t-2xl">
             <Image
-              className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+              className="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500"
               src={thumbnailUrl}
               alt={course.title || "Course thumbnail"}
-              width={320} // Matches the largest card width (md:w-80)
-              height={192} // Matches the largest image height (sm:h-48)
-              priority // Optional: Prioritize loading for above-the-fold images
+              unoptimized
             />
             {/* Top Seller Badge */}
             {isTopSeller && (
@@ -53,7 +53,7 @@ const CourseCard = ({ course, isTopSeller }) => {
           </div>
 
           {/* Content Section */}
-          <div className="p-4 flex-1 flex flex-col">
+          <div className="p-4">
             {/* Title */}
             <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
               {course.title}
@@ -99,7 +99,7 @@ const CourseCard = ({ course, isTopSeller }) => {
             </div>
 
             {/* Go to Course Button */}
-            <div className="mt-auto">
+            <div className="flex justify-center">
               <button
                 onClick={(e) => e.stopPropagation()} // Prevent link navigation on button click
                 className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors duration-300"
