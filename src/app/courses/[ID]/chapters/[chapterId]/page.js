@@ -129,7 +129,7 @@ export default function ChapterPage() {
           <div className="space-y-6">
             <h2 className="text-2xl font-semibold text-gray-700">Videos</h2>
             <div className="flex justify-center">
-              <div className="w-full lg:w-3/4 xl:w-2/3 h-screen">
+              <div className="w-full lg:w-3/4 xl:w-2/3">
                 {content.videos.map((video) => {
                   const embedUrl = extractVideoId(video.url)
                     ? `https://www.youtube.com/embed/${extractVideoId(
@@ -147,7 +147,9 @@ export default function ChapterPage() {
                         {video.title}
                       </h3>
                       {embedUrl ? (
-                        <div className="aspect-w-16 aspect-h-9">
+                        <div className="relative h-[75vh]">
+                          {" "}
+                          {/* 75% of viewport height */}
                           <iframe
                             className="w-full h-full rounded-lg"
                             src={embedUrl}
@@ -250,7 +252,9 @@ export default function ChapterPage() {
             <h3 className="text-2xl font-bold text-gray-800 mb-4">
               {selectedVideo.title}
             </h3>
-            <div className="aspect-w-16 aspect-h-9">
+            <div className="relative h-[75vh]">
+              {" "}
+              {/* 75% of viewport height */}
               <iframe
                 className="w-full h-full rounded-lg"
                 src={`https://www.youtube.com/embed/${extractVideoId(
