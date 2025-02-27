@@ -16,6 +16,7 @@ const CreatorRegistrationForm = () => {
     socialLinks: "",
     bankAccount: "",
     bankType: "",
+    profilePicture: null, // Added for file upload
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
@@ -39,14 +40,36 @@ const CreatorRegistrationForm = () => {
     }));
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setFormData((prev) => ({
+      ...prev,
+      profilePicture: file,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const dataToSend = {
-      userId,
-      ...formData,
-    };
+    // Format socialLinks as a JSON object
+    const socialLinks = formData.socialLinks
+      ? JSON.stringify({ link: formData.socialLinks }) // Assuming a single link for simplicity
+      : null;
+
+    const dataToSend = new FormData();
+    dataToSend.append("userId", userId);
+    dataToSend.append("bio", formData.bio);
+    dataToSend.append("educationLevel", formData.educationLevel);
+    dataToSend.append("experience", formData.experience);
+    dataToSend.append("skills", formData.skills);
+    dataToSend.append("location", formData.location);
+    dataToSend.append("socialLinks", socialLinks);
+    dataToSend.append("bankAccount", formData.bankAccount);
+    dataToSend.append("bankType", formData.bankType);
+    if (formData.profilePicture) {
+      dataToSend.append("profilePicture", formData.profilePicture);
+    }
 
     try {
       const response = await axios.post(
@@ -54,7 +77,7 @@ const CreatorRegistrationForm = () => {
         dataToSend,
         {
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -88,22 +111,39 @@ const CreatorRegistrationForm = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Profile Picture Upload */}
           <input
-            type="text"
+            type="file"
+            name="profilePicture"
+            onChange={handleFileChange}
+            className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
+          />
+
+          {/* Bio */}
+          <textarea
             name="bio"
             value={formData.bio}
             onChange={handleChange}
             placeholder="Tell us about yourself in a few words..."
             className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
           />
-          <input
-            type="text"
+
+          {/* Education Level */}
+          <select
             name="educationLevel"
             value={formData.educationLevel}
             onChange={handleChange}
-            placeholder="Highest education level (e.g., BSc in Computer Science)"
             className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-          />
+          >
+            <option value="">Select your education level</option>
+            <option value="High School">High School</option>
+            <option value="Bachelor">Bachelor</option>
+            <option value="Master">Master</option>
+            <option value="PhD">PhD</option>
+            <option value="Other">Other</option>
+          </select>
+
+          {/* Experience */}
           <input
             type="text"
             name="experience"
@@ -112,6 +152,8 @@ const CreatorRegistrationForm = () => {
             placeholder="Years of experience in teaching or your field"
             className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
           />
+
+          {/* Skills */}
           <input
             type="text"
             name="skills"
@@ -121,7 +163,7 @@ const CreatorRegistrationForm = () => {
             className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
           />
 
-          {/* Ethiopian Cities Dropdown */}
+          {/* Location */}
           <select
             name="location"
             value={formData.location}
@@ -142,6 +184,7 @@ const CreatorRegistrationForm = () => {
             <option value="Shashemene">Shashemene</option>
           </select>
 
+          {/* Social Links */}
           <input
             type="text"
             name="socialLinks"
@@ -167,6 +210,7 @@ const CreatorRegistrationForm = () => {
             <option value="Bank of Abyssinia">Bank of Abyssinia</option>
           </select>
 
+          {/* Bank Account */}
           <input
             type="text"
             name="bankAccount"
@@ -176,6 +220,7 @@ const CreatorRegistrationForm = () => {
             className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
           />
 
+          {/* Submit Button */}
           <button
             type="submit"
             className="w-full p-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all duration-200 disabled:opacity-50"
