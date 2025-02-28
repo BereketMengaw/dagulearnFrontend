@@ -26,6 +26,7 @@ const CreatorRegistrationForm = () => {
     const userData = JSON.parse(localStorage.getItem("user"));
     if (userData?.userId) {
       setUserId(userData.userId);
+      console.log("User ID set:", userData.userId); // Debugging
     } else {
       alert("You must be logged in to register as a creator.");
       router.push("/login");
@@ -50,6 +51,14 @@ const CreatorRegistrationForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if userId is available
+    if (!userId) {
+      alert("User ID is missing. Please log in again.");
+      router.push("/login");
+      return;
+    }
+
     setIsSubmitting(true);
 
     // Format socialLinks as a JSON object
@@ -58,7 +67,7 @@ const CreatorRegistrationForm = () => {
       : null;
 
     const dataToSend = new FormData();
-    dataToSend.append("userId", userId);
+    dataToSend.append("userId", userId); // Ensure userId is included
     dataToSend.append("bio", formData.bio);
     dataToSend.append("educationLevel", formData.educationLevel);
     dataToSend.append("experience", formData.experience);
