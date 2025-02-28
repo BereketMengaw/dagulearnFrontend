@@ -7,106 +7,90 @@ import Navbar from "../../../components/Navbar/Navbar.js";
 
 const CreatorRegistrationForm = () => {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    bio: "",
-    educationLevel: "",
-    experience: "",
-    skills: "",
-    location: "",
-    socialLinks: "",
-    bankAccount: "",
-    bankType: "",
-    profilePicture: null, // Added for file upload
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [userId, setUserId] = useState(null);
+const [formData, setFormData] = useState({
+  bio: "",
+  educationLevel: "",
+  experience: "",
+  skills: "",
+  location: "",
+  socialLinks: "",
+  bankAccount: "",
+  bankType: "",
+  profilePicture: null,
+  userId: null, // Include userId in formData
+});
 
-  useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("user"));
-    if (userData?.userId) {
-      setUserId(userData.userId);
-      console.log("User ID set:", userData.userId); // Debugging
-    } else {
-      alert("You must be logged in to register as a creator.");
-      router.push("/login");
-    }
-  }, [router]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+useEffect(() => {
+  const userData = JSON.parse(localStorage.getItem("user"));
+  if (userData?.userId) {
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      userId: userData.userId, // Set userId in formData
     }));
-  };
+    console.log("User ID set:", userData.userId); // Debugging
+  } else {
+    alert("You must be logged in to register as a creator.");
+    router.push("/login");
+  }
+}, [router]);
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setFormData((prev) => ({
-      ...prev,
-      profilePicture: file,
-    }));
-  };
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Check if userId is available
+  if (!formData.userId) {
+    alert("User ID is missing. Please log in again.");
+    router.push("/login");
+    return;
+  }
 
-    // Check if userId is available
-    if (!userId) {
-      alert("User ID is missing. Please log in again.");
-      router.push("/login");
-      return;
-    }
+  setIsSubmitting(true);
 
-    setIsSubmitting(true);
+  // Format socialLinks as a JSON object
+  const socialLinks = formData.socialLinks
+    ? JSON.stringify({ link: formData.socialLinks }) // Assuming a single link for simplicity
+    : null;
 
-    // Format socialLinks as a JSON object
-    const socialLinks = formData.socialLinks
-      ? JSON.stringify({ link: formData.socialLinks }) // Assuming a single link for simplicity
-      : null;
+  const dataToSend = new FormData();
+  dataToSend.append("userId", formData.userId); // Use formData.userId
+  dataToSend.append("bio", formData.bio);
+  dataToSend.append("educationLevel", formData.educationLevel);
+  dataToSend.append("experience", formData.experience);
+  dataToSend.append("skills", formData.skills);
+  dataToSend.append("location", formData.location);
+  dataToSend.append("socialLinks", socialLinks);
+  dataToSend.append("bankAccount", formData.bankAccount);
+  dataToSend.append("bankType", formData.bankType);
+  if (formData.profilePicture) {
+    dataToSend.append("profilePicture", formData.profilePicture);
+  }
 
-    const dataToSend = new FormData();
-    dataToSend.append("userId", userId); // Ensure userId is included
-    dataToSend.append("bio", formData.bio);
-    dataToSend.append("educationLevel", formData.educationLevel);
-    dataToSend.append("experience", formData.experience);
-    dataToSend.append("skills", formData.skills);
-    dataToSend.append("location", formData.location);
-    dataToSend.append("socialLinks", socialLinks);
-    dataToSend.append("bankAccount", formData.bankAccount);
-    dataToSend.append("bankType", formData.bankType);
-    if (formData.profilePicture) {
-      dataToSend.append("profilePicture", formData.profilePicture);
-    }
-
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/creator/creators`,
-        dataToSend,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      if (response.data.success) {
-        alert("Creator registration successful!");
-        router.push("/creator-dashboard");
-      } else {
-        setErrors({
-          general: response.data.message || "Something went wrong.",
-        });
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/creator/creators`,
+      dataToSend,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }
-    } catch (error) {
-      console.error("Error during form submission:", error);
-      setErrors({ general: error.message });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    );
 
+    if (response.data.success) {
+      alert("Creator registration successful!");
+      router.push("/creator-dashboard");
+    } else {
+      setErrors({
+        general: response.data.message || "Something went wrong.",
+      });
+    }
+  } catch (error) {
+    console.error("Error during form submission:", error);
+    setErrors({ general: error.message });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
   return (
     <>
       <Navbar />
