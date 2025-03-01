@@ -7,90 +7,113 @@ import Navbar from "../../../components/Navbar/Navbar.js";
 
 const CreatorRegistrationForm = () => {
   const router = useRouter();
-const [formData, setFormData] = useState({
-  bio: "",
-  educationLevel: "",
-  experience: "",
-  skills: "",
-  location: "",
-  socialLinks: "",
-  bankAccount: "",
-  bankType: "",
-  profilePicture: null,
-  userId: null, // Include userId in formData
-});
+  const [formData, setFormData] = useState({
+    bio: "",
+    educationLevel: "",
+    experience: "",
+    skills: "",
+    location: "",
+    socialLinks: "",
+    bankAccount: "",
+    bankType: "",
+    profilePicture: null, // Added for file upload
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [userId, setUserId] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // Add a loading state
 
-useEffect(() => {
-  const userData = JSON.parse(localStorage.getItem("user"));
-  if (userData?.userId) {
+  useEffect(() => {
+    // Fetch user data from localStorage
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      console.log(parsedUser, "this is the parsed user");
+      setUserData(parsedUser); // Set user data
+      setUserId(parsedUser.userId); // Set userId from parsedUser
+    }
+    setIsLoading(false); // Mark loading as complete
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      userId: userData.userId, // Set userId in formData
+      [name]: value,
     }));
-    console.log("User ID set:", userData.userId); // Debugging
-  } else {
-    alert("You must be logged in to register as a creator.");
-    router.push("/login");
-  }
-}, [router]);
+  };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setFormData((prev) => ({
+      ...prev,
+      profilePicture: file,
+    }));
+  };
 
-  // Check if userId is available
-  if (!formData.userId) {
-    alert("User ID is missing. Please log in again.");
-    router.push("/login");
-    return;
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
-  setIsSubmitting(true);
+    // Format socialLinks as a JSON object
+    const socialLinks = formData.socialLinks
+      ? JSON.stringify({ linkedin: formData.socialLinks }) // Format as JSON string
+      : null;
 
-  // Format socialLinks as a JSON object
-  const socialLinks = formData.socialLinks
-    ? JSON.stringify({ link: formData.socialLinks }) // Assuming a single link for simplicity
-    : null;
+    // Prepare the data to send
+    const dataToSend = {
+      userId: userData.userId, // Include userId from state
+      bio: formData.bio,
+      educationLevel: formData.educationLevel,
+      experience: formData.experience,
+      skills: formData.skills,
+      location: formData.location,
+      socialLinks, // Use the formatted JSON string
+      bankAccount: formData.bankAccount,
+      bankType: formData.bankType,
+    };
 
-  const dataToSend = new FormData();
-  dataToSend.append("userId", formData.userId); // Use formData.userId
-  dataToSend.append("bio", formData.bio);
-  dataToSend.append("educationLevel", formData.educationLevel);
-  dataToSend.append("experience", formData.experience);
-  dataToSend.append("skills", formData.skills);
-  dataToSend.append("location", formData.location);
-  dataToSend.append("socialLinks", socialLinks);
-  dataToSend.append("bankAccount", formData.bankAccount);
-  dataToSend.append("bankType", formData.bankType);
-  if (formData.profilePicture) {
-    dataToSend.append("profilePicture", formData.profilePicture);
-  }
+    console.log(dataToSend, "this is data to send ");
 
-  try {
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/creator/creators`,
-      dataToSend,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    if (response.data.success) {
-      alert("Creator registration successful!");
-      router.push("/creator-dashboard");
-    } else {
-      setErrors({
-        general: response.data.message || "Something went wrong.",
-      });
+    // If profilePicture is included, append it to FormData
+    const formDataToSend = new FormData();
+    for (const key in dataToSend) {
+      formDataToSend.append(key, dataToSend[key]);
     }
-  } catch (error) {
-    console.error("Error during form submission:", error);
-    setErrors({ general: error.message });
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+    if (formData.profilePicture) {
+      formDataToSend.append("profilePicture", formData.profilePicture);
+    }
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/creator/creators`,
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log(dataToSend, "this is data to send ");
+
+      if (response.data.success) {
+        alert("Creator registration successful!");
+        router.push("/creator-dashboard");
+      } else {
+        setErrors({
+          general: response.data.message || "Something went wrong.",
+        });
+      }
+    } catch (error) {
+      console.error("Error during form submission:", error);
+      setErrors({ general: error.message });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -105,12 +128,6 @@ const handleSubmit = async (e) => {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Profile Picture Upload */}
-          <input
-            type="file"
-            name="profilePicture"
-            onChange={handleFileChange}
-            className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-          />
 
           {/* Bio */}
           <textarea
@@ -138,12 +155,14 @@ const handleSubmit = async (e) => {
 
           {/* Experience */}
           <input
-            type="text"
+            type="number" // Change type to "number"
             name="experience"
             value={formData.experience}
             onChange={handleChange}
             placeholder="Years of experience in teaching or your field"
             className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
+            min="0" // Optional: Set a minimum value (e.g., 0)
+            step="1" // Optional: Ensure only whole numbers are allowed
           />
 
           {/* Skills */}
