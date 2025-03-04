@@ -15,7 +15,7 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "DAGULEARN",
+  title: "Dagulearn",
   description:
     "The first well organised paid course sharing platform open for anyone ",
   icons: {
