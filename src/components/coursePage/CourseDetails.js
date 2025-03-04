@@ -209,92 +209,90 @@ export default function CourseDetails({ course, chapters }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* User and Creator Info Section */}
 
-        <div className="bg-white p-8 rounded-xl shadow-lg mb-6 flex flex-col md:flex-row items-start space-y-6 md:space-y-0 md:space-x-8">
-          {/* Profile Picture on the Left */}
-          {creator?.profilePicture && (
-            <div className="w-32 h-32 flex-shrink-0">
-              <Image
-                src={`${process.env.NEXT_PUBLIC_API_URL}${creator.profilePicture}`}
-                alt="Profile"
-                width={128}
-                height={128}
-                className="w-full h-full rounded-full object-cover border-4 border-white shadow-md"
-              />
+      <div className="bg-white mb-3 dark:bg-gray-800 flex justify-center rounded-xl shadow-2xl max-w-4xl w-full p-8 transition-all duration-300 animate-fade-in">
+          <div className="flex flex-col md:flex-row">
+            {/* Profile Picture on the Left */}
+            <div className="md:w-1/3 text-center mb-8 md:mb-0">
+              {creator?.profilePicture && (
+                <div className="w-48 h-48 mx-auto mb-4">
+                  <img
+                    src={`${process.env.NEXT_PUBLIC_API_URL}${creator.profilePicture}`}
+                    alt="Profile"
+                    className="w-full h-full rounded-full object-cover border-4 border-indigo-800 dark:border-blue-900 transition-transform duration-300 hover:scale-105"
+                  />
+                </div>
+              )}
+              <h1 className="text-2xl font-bold text-indigo-800 dark:text-white mb-2">
+                {name}
+              </h1>
             </div>
-          )}
 
-          {/* Creator Information on the Right */}
-          <div className="flex flex-col justify-center flex-grow space-y-4">
-            {user && (
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                  About Creator
-                </h2>
-                <div className="space-y-2">
-                  <p className="text-gray-700">
-                    <span className="font-semibold">Name:</span> {name}
-                  </p>
-                  <p className="text-gray-700">
-                    <span className="font-semibold">Email:</span>{" "}
-                    <a
-                      href={`mailto:${gmail}`}
-                      className="text-blue-600 hover:underline"
-                    >
-                      {gmail}
-                    </a>
-                  </p>
-                </div>
+            {/* Creator Information on the Right */}
+            <div className="md:w-2/3 md:pl-8">
+              <h2 className="text-xl font-semibold text-indigo-800 dark:text-white mb-4">
+                About Creator
+              </h2>
+              <p className="text-gray-700 dark:text-gray-300 mb-6">
+                {creator?.bio ||
+                  "Passionate software developer with 5 years of experience in web technologies. I love creating user-friendly applications and solving complex problems."}
+              </p>
+
+              <h2 className="text-xl font-semibold text-indigo-800 dark:text-white mb-4">
+                Skills
+              </h2>
+              <div className="flex flex-wrap gap-2 mb-6">
+                {creator?.skills?.split(",").map((skill, index) => (
+                  <span
+                    key={index}
+                    className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm"
+                  >
+                    {skill.trim()}
+                  </span>
+                ))}
               </div>
-            )}
 
-            {creator && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <p className="text-gray-700">
-                    <span className="font-semibold">Experience:</span>{" "}
-                    {creator.experience} years
-                  </p>
-                  <p className="text-gray-700">
-                    <span className="font-semibold">Education Level:</span>{" "}
-                    {creator.educationLevel}
-                  </p>
-                  <p className="text-gray-700">
-                    <span className="font-semibold">Skills:</span>{" "}
-                    {creator.skills}
-                  </p>
-                  <p className="text-gray-700">
-                    <span className="font-semibold">Location:</span>{" "}
-                    {creator.location}
-                  </p>
-                </div>
+              <h2 className="text-xl font-semibold text-indigo-800 dark:text-white mb-4">
+                Contact Information
+              </h2>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+                <li className="flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-2 text-indigo-800 dark:text-blue-900"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                  </svg>
+                  <a
+                    href={`mailto:${gmail}`}
+                    className="text-blue-600 hover:underline"
+                  >
+                    {gmail}
+                  </a>
+                </li>
 
-                {/* Bio Section */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-gray-700">
-                    <span className="font-semibold">Bio:</span> {creator.bio}
-                  </p>
-                </div>
-
-                {/* Social Links */}
-                {creator.socialLinks?.linkedin && (
-                  <div className="flex items-center space-x-2">
-                    <span className="font-semibold text-gray-700">
-                      LinkedIn:
-                    </span>
-                    <a
-                      href={creator.socialLinks.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      View Profile
-                    </a>
-                  </div>
-                )}
-              </div>
-            )}
+                <li className="flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-2 text-indigo-800 dark:text-blue-900"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  {creator?.location}
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
+
 
         {/* Course Details */}
         <div className="flex flex-col md:flex-row items-start space-y-6 md:space-y-0 md:space-x-6">
