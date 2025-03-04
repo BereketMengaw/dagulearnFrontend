@@ -3,6 +3,7 @@
 import Navbar from "@/components/Navbar/Navbar";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import LoadingSpinner from "@/components/loading/page";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { registerCreator, updateCreator } from "@/lib/api";
@@ -119,7 +120,7 @@ const CreatorRegistrationForm = () => {
     }
   }, [creator, loading, router]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div><LoadingSpinner /></div>;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
