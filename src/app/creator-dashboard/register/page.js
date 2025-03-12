@@ -120,7 +120,12 @@ const CreatorRegistrationForm = () => {
     }
   }, [creator, loading, router]);
 
-  if (loading) return <div><LoadingSpinner /></div>;
+  if (loading)
+    return (
+      <div>
+        <LoadingSpinner />
+      </div>
+    );
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -229,6 +234,8 @@ const CreatorRegistrationForm = () => {
                 <Image
                   src={`${apiUrl}${creator.profilePicture}`}
                   alt="Profile"
+                  width={100}
+                  height={100}
                   className="w-32 h-32 rounded-full object-cover border border-gray-300"
                   unoptimized
                 />

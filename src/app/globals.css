@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Cedarville+Cursive&family=Delicious+Handrawn&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Cedarville+Cursive&family=Delicious+Handrawn&family=Rock+Salt&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:opsz,wght@10..72,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -127,5 +128,40 @@ body {
   font-family: "Big Shoulders Stencil", sans-serif;
   font-optical-sizing: auto;
   font-weight: 100;
+  font-style: normal;
+}
+
+/*login button popup */
+
+.btn {
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+/* 1. Pulse Animation */
+.btn-pulse {
+  background-color: #3498db;
+  color: white;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.caveat {
+  font-family: "Caveat", cursive;
+  font-optical-sizing: auto;
+  font-weight: 200;
   font-style: normal;
 }
