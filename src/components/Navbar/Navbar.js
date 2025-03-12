@@ -37,9 +37,9 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white shadow sticky top-0 z-50 w-full">
-      <div className="flex items-center justify-between px-4 py-2 md:px-8">
+      <div className="flex items-center justify-between px-4 py-2 md:px-8 ">
         {/* Logo */}
-        <div className="text-lg font-bold text-gray-800 flex-shrink-0 min-w-[100px]">
+        <div className="text-lg font-bold text-gray-800 flex-shrink-0 min-w-[100px]   cursive-regular ">
           <Link href="/">DAGULEARN</Link>
         </div>
 
