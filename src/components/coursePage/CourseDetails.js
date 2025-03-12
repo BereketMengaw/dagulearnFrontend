@@ -209,7 +209,7 @@ export default function CourseDetails({ course, chapters }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* User and Creator Info Section */}
 
-      <div className="bg-white mb-3 dark:bg-gray-800 flex justify-center rounded-xl shadow-2xl max-w-4xl w-full p-8 transition-all duration-300 animate-fade-in">
+        <div className="bg-white mb-3 dark:bg-gray-800 flex justify-center rounded-xl shadow-2xl max-w-4xl w-full p-8 transition-all duration-300 animate-fade-in">
           <div className="flex flex-col md:flex-row">
             {/* Profile Picture on the Left */}
             <div className="md:w-1/3 text-center mb-8 md:mb-0">
@@ -293,12 +293,13 @@ export default function CourseDetails({ course, chapters }) {
           </div>
         </div>
 
-
         {/* Course Details */}
         <div className="flex flex-col md:flex-row items-start space-y-6 md:space-y-0 md:space-x-6">
           <Image
             className="w-full md:w-1/3 h-64 object-cover rounded-lg"
             src={thumbnailUrl}
+            width={100}
+            height={100}
             alt={course.title || "Course thumbnail"}
           />
           <div className="flex-grow">

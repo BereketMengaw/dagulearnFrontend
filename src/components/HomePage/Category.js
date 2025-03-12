@@ -72,7 +72,7 @@ const Category = () => {
 
   return (
     <div className="container mx-auto pb-8 px-4">
-      <h1 className="text-3xl font-bold text-center text-gray-900 mb-6">
+      <h1 className="text-3xl font-bold text-center text-gray-900 mb-6 caveat ">
         Explore Top Categories
       </h1>
 
@@ -95,7 +95,7 @@ const Category = () => {
         >
           <button
             onClick={() => setSelectedCategory(null)}
-            className={`text-lg font-semibold px-6 py-3 border rounded-full shadow-md transition mx-2 ${
+            className={`text-lg caveat  font-semibold px-6 py-3 border rounded-full shadow-md transition mx-2 ${
               selectedCategory === null
                 ? "bg-blue-600 text-white"
                 : "bg-gray-100"
@@ -107,7 +107,7 @@ const Category = () => {
             <button
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
-              className={`text-lg font-semibold px-6 py-3 border rounded-full shadow-md transition mx-2 ${
+              className={`text-lg caveat  font-semibold px-6 py-3 border rounded-full shadow-md transition mx-2 ${
                 selectedCategory === category.id
                   ? "bg-blue-600 text-white"
                   : "bg-gray-100"

@@ -37,9 +37,9 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white shadow sticky top-0 z-50 w-full">
-      <div className="flex items-center justify-between px-4 py-2 md:px-8">
+      <div className="flex items-center justify-between px-4 py-2 md:px-8 ">
         {/* Logo */}
-        <div className="text-lg font-bold text-gray-800 flex-shrink-0 min-w-[100px]">
+        <div className="text-lg font-bold text-gray-800 flex-shrink-0 min-w-[100px]   cursive-regular ">
           <Link href="/">DAGULEARN</Link>
         </div>
 
@@ -52,13 +52,13 @@ const Navbar = () => {
             <>
               <Link
                 href="/auth/login"
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-300"
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-300 btn btn-pulse"
               >
                 Login
               </Link>
               <Link
                 href="/auth/signup"
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-300 ml-4"
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-300 ml-4 btn btn-pulse"
               >
                 Signup
               </Link>
@@ -68,18 +68,21 @@ const Navbar = () => {
           {/* Show "Creator" button only for logged-in users with role "creator" */}
           {userData && userData.role === "creator" && (
             <div className="relative">
-              <button onClick={toggleDropdown} className="hover:text-blue-500">
+              <button
+                onClick={toggleDropdown}
+                className="hover:text-blue-500 cursive-regular"
+              >
                 Creator
               </button>
 
               {/* Creator Dropdown */}
               {isDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white border rounded-md shadow-lg z-50 cursive-regular">
                   <Link
                     href="/creator-dashboard/register"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                   >
-                    Register
+                    Creator Info
                   </Link>
                   <Link
                     href="/creator-dashboard"
@@ -126,7 +129,7 @@ const Navbar = () => {
                     Dashboard
                   </Link>
                   <button
-                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-red-600"
                     onClick={() => {
                       localStorage.removeItem("user");
                       setUserData(null); // Clear user data
@@ -187,13 +190,13 @@ const Navbar = () => {
                   <div className="flex flex-col space-y-4 mt-2">
                     <Link
                       href="/creator-dashboard/register"
-                      className="hover:bg-gray-100 px-4 py-2"
+                      className="hover:bg-gray-100 px-4 py-2 cursive-regular"
                     >
-                      Register
+                      Creator Info
                     </Link>
                     <Link
                       href="/creator-dashboard"
-                      className="hover:bg-gray-100 px-4 py-2"
+                      className="hover:bg-gray-100 px-4 py-2 cursive-regular"
                     >
                       Creator Dashboard
                     </Link>
@@ -236,7 +239,7 @@ const Navbar = () => {
                       Dashboard
                     </Link>
                     <button
-                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-red-600"
                       onClick={() => {
                         localStorage.removeItem("user");
                         setUserData(null); // Clear user data

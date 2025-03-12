@@ -40,6 +40,8 @@ const CourseCard = ({ course, isTopSeller }) => {
             <Image
               className="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500"
               src={thumbnailUrl}
+              width={100}
+              height={100}
               alt={course.title || "Course thumbnail"}
               unoptimized
             />
