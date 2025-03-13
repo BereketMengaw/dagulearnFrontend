@@ -298,8 +298,6 @@ export default function CourseDetails({ course, chapters }) {
           <Image
             className="w-full md:w-1/3 h-64 object-cover rounded-lg"
             src={thumbnailUrl}
-            width={100}
-            height={100}
             alt={course.title || "Course thumbnail"}
           />
           <div className="flex-grow">
