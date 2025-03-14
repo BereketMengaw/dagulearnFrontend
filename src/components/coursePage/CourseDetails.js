@@ -295,7 +295,7 @@ export default function CourseDetails({ course, chapters }) {
 
         {/* Course Details */}
         <div className="flex flex-col md:flex-row items-start space-y-6 md:space-y-0 md:space-x-6">
-          <Image
+          <img
             className="w-full md:w-1/3 h-64 object-cover rounded-lg"
             src={thumbnailUrl}
             alt={course.title || "Course thumbnail"}
