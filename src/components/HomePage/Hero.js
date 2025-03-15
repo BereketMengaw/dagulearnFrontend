@@ -8,8 +8,8 @@ const Hero = () => {
   const [isTeacherModalOpen, setIsTeacherModalOpen] = useState(false);
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
 
-  const teacherVideoUrl = "https://www.youtube.com/embed/ZHwnOWgyQj8";
-  const studentVideoUrl = "https://www.youtube.com/embed/ZHwnOWgyQj8";
+  const teacherVideoUrl = "https://youtu.be/lj2z4yqhkIE";
+  const studentVideoUrl = "https://youtu.be/lj2z4yqhkIE";
 
   return (
     <>
