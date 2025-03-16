@@ -6,6 +6,8 @@ import {
   fetchEnrollmentsCount,
 } from "../../lib/fetcher";
 
+import Page from "@/components/HomePage/Page";
+
 const Category = () => {
   const [categories, setCategories] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -131,7 +133,7 @@ const Category = () => {
       </div>
 
       {/* Course List */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-6">
         {paginatedCourses.map((course, index) => (
           <CourseCard
             key={course.id}
@@ -142,37 +144,12 @@ const Category = () => {
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-center mt-8 space-x-2">
-        <button
-          className="px-3 py-1 rounded-md bg-gray-200"
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage(currentPage - 1)}
-        >
-          Prev
-        </button>
-
-        {[...Array(totalPages)].map((_, index) => (
-          <button
-            key={index}
-            className={`px-3 py-1 rounded-md ${
-              currentPage === index + 1
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200"
-            }`}
-            onClick={() => setCurrentPage(index + 1)}
-          >
-            {index + 1}
-          </button>
-        ))}
-
-        <button
-          className="px-3 py-1 rounded-md bg-gray-200"
-          disabled={currentPage === totalPages}
-          onClick={() => setCurrentPage(currentPage + 1)}
-        >
-          Next
-        </button>
-      </div>
+      {/* Updated Pagination */}
+      <Page
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   );
 };

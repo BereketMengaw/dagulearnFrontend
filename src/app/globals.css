@@ -2,6 +2,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Cedarville+Cursive&family=Delicious+Handrawn&family=Rock+Salt&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:opsz,wght@10..72,100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Rock+Salt&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -153,8 +154,6 @@ body {
   font-style: normal;
 }
 
-
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -211,8 +210,6 @@ body {
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border;
@@ -220,4 +217,10 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.rock-salt-regular {
+  font-family: "Rock Salt", cursive;
+  font-weight: 400;
+  font-style: normal;
 }

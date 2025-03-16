@@ -11,6 +11,7 @@ import Category from "@/components/HomePage/Category";
 import Navbar from "@/components/Navbar/Navbar";
 import DownButton from "@/components/HomePage/DownButton";
 import CategoryList from "@/components/HomePage/Category";
+import AuthPopup from "@/app/auth/AuthPopup";
 
 const HomePage = () => {
   const handleScroll = () => {
@@ -19,10 +20,20 @@ const HomePage = () => {
       targetSection.scrollIntoView({ behavior: "smooth" });
     }
   };
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
+
   return (
     <>
       <div className="w-full max-w-full">
-        <Navbar />
+        <Navbar setShowAuthPopup={setShowAuthPopup} />
+
+        {showAuthPopup && (
+          <AuthPopup
+            setShowAuthPopup={setShowAuthPopup}
+            onClose={() => setShowAuthPopup(false)}
+          />
+        )}
+
         <Hero />
         <Category />
         <Button variant="outline">Button</Button>

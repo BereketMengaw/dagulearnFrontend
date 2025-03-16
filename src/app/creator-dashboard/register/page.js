@@ -3,7 +3,7 @@
 import Navbar from "@/components/Navbar/Navbar";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import LoadingSpinner from "@/components/loading/page";
+import Load from "@/components/load/page";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { registerCreator, updateCreator } from "@/lib/api";
@@ -123,7 +123,7 @@ const CreatorRegistrationForm = () => {
   if (loading)
     return (
       <div>
-        <LoadingSpinner />
+        <Load />
       </div>
     );
 

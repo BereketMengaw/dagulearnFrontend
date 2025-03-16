@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react"; // Icon from lucide-react
+import User from "./UserNav";
 
-const Navbar = () => {
+const Navbar = ({ setShowAuthPopup }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isAvatarDropdownOpen, setIsAvatarDropdownOpen] = useState(false);
@@ -43,105 +44,33 @@ const Navbar = () => {
           <Link href="/">DAGULEARN</Link>
         </div>
 
-        {/* Search Bar (Hidden on Small Screens) */}
-
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-4">
           {/* Show login/signup buttons for guests */}
           {!userData && (
             <>
-              <Link
-                href="/auth/login"
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-300 btn btn-pulse"
-              >
-                Login
-              </Link>
-              <Link
-                href="/auth/signup"
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-300 ml-4 btn btn-pulse"
-              >
-                Signup
-              </Link>
+              <div>
+                <button
+                  onClick={() => setShowAuthPopup(true)}
+                  className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
+                >
+                  <span className="relative px-5 py-1.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
+                    {" "}
+                    Login / Signup
+                  </span>
+                </button>
+              </div>
             </>
           )}
 
           {/* Show "Creator" button only for logged-in users with role "creator" */}
-          {userData && userData.role === "creator" && (
-            <div className="relative">
-              <button
-                onClick={toggleDropdown}
-                className="hover:text-blue-500 cursive-regular"
-              >
-                Creator
-              </button>
 
-              {/* Creator Dropdown */}
-              {isDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white border rounded-md shadow-lg z-50 cursive-regular">
-                  <Link
-                    href="/creator-dashboard/register"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    Creator Info
-                  </Link>
-                  <Link
-                    href="/creator-dashboard"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    Creator Dashboard
-                  </Link>
-                  <Link
-                    href="/creator-agreement"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    Creator Agreement
-                  </Link>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Show "Hello, [Name]" and avatar dropdown for logged-in users */}
-          {userData && (
-            <div className="relative flex items-center space-x-2">
-              <span className="text-gray-700">Hello, {userName}</span>
-
-              <button
-                onClick={toggleAvatarDropdown}
-                className="focus:outline-none"
-              >
-                <span
-                  role="img"
-                  aria-label="avatar"
-                  className="text-2xl bg-gray-200 rounded-full p-2 text-gray-800"
-                >
-                  🧑‍🎓
-                </span>
-              </button>
-
-              {/* Avatar Dropdown */}
-              {isAvatarDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
-                  <Link
-                    href="/dashboard"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    Dashboard
-                  </Link>
-                  <button
-                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-red-600"
-                    onClick={() => {
-                      localStorage.removeItem("user");
-                      setUserData(null); // Clear user data
-                      setUserName("Guest"); // Reset username
-                    }}
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
+          <User
+            userData={userData}
+            userName={userName}
+            setUserData={setUserData}
+            setUserName={setUserName}
+          />
         </div>
 
         {/* Mobile Menu Button */}
@@ -160,18 +89,12 @@ const Navbar = () => {
             {/* Show login/signup buttons for guests */}
             {!userData && (
               <>
-                <Link
-                  href="/auth/login"
+                <button
+                  onClick={() => setShowAuthPopup(true)}
                   className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-300"
                 >
-                  Login
-                </Link>
-                <Link
-                  href="/auth/signup"
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-300"
-                >
-                  Signup
-                </Link>
+                  Login / Signup
+                </button>
               </>
             )}
 
@@ -214,7 +137,9 @@ const Navbar = () => {
             {/* Show "Hello, [Name]" and avatar dropdown for logged-in users */}
             {userData && (
               <div className="relative">
-                <span className="text-gray-700">Hello, {userName}</span>
+                <span className="text-gray-700 cursive-regular">
+                  Hello, {userName}
+                </span>
 
                 <button
                   onClick={toggleAvatarDropdown}

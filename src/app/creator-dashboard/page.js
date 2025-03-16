@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import Load from "@/components/load/page";
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -73,24 +74,19 @@ const CreatorDashboard = () => {
   }, [checkingCreator, creator, router]);
 
   if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <Load />;
   }
 
   return (
     <>
       <Navbar />
-      <Button variant="outline">Button</Button>
 
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col items-center p-4 md:p-8">
         <header className="w-full max-w-6xl bg-white p-8 rounded-2xl shadow-lg mb-8 text-center md:text-left transition-shadow hover:shadow-xl">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            👋 Hello, {userName}! Welcome to Your Creator Dashboard!
+          <h1 className="text-2xl md:text-2xl font-bold text-gray-900 mb-4 rock-salt-regular">
+            👋 Hello, <>{userName}! </> Welcome to Your Creator Dashboard!
           </h1>
-          <p className="text-gray-600 text-lg md:text-xl">
+          <p className="text-gray-600 text-lg md:text-xl cursive-regular ml-28 ">
             Manage your courses, upload new ones, and track your progress here.
           </p>
         </header>
@@ -98,7 +94,7 @@ const CreatorDashboard = () => {
         <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           <Link href="/creator-dashboard/create-course">
             <div className="cursor-pointer bg-gradient-to-r from-blue-500 to-blue-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-transform hover:scale-105">
-              <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              <h2 className="text-2xl md:text-3xl cursive-regular font-bold mb-4">
                 📝 Create a Course
               </h2>
               <p className="text-lg md:text-xl">
@@ -109,7 +105,7 @@ const CreatorDashboard = () => {
 
           <Link href="/creator-dashboard/my-courses">
             <div className="cursor-pointer bg-gradient-to-r from-green-500 to-green-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-transform hover:scale-105">
-              <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 cursive-regular ">
                 📚 My Courses
               </h2>
               <p className="text-lg md:text-xl">
@@ -120,7 +116,7 @@ const CreatorDashboard = () => {
 
           <Link href="/creator-dashboard/enrollments">
             <div className="cursor-pointer bg-gradient-to-r from-yellow-500 to-yellow-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-transform hover:scale-105">
-              <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 cursive-regular">
                 👥 Enrollments
               </h2>
               <p className="text-lg md:text-xl">
@@ -131,7 +127,7 @@ const CreatorDashboard = () => {
 
           <Link href="/creator-dashboard/earnings">
             <div className="cursor-pointer bg-gradient-to-r from-purple-500 to-purple-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-transform hover:scale-105">
-              <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 cursive-regular">
                 💰 Earnings
               </h2>
               <p className="text-lg md:text-xl">

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Load from "@/components/load/page";
 
 const CourseList = () => {
   const [courses, setCourses] = useState([]);
@@ -43,12 +44,7 @@ const CourseList = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div
-          className="spinner-border animate-spin text-gray-500"
-          role="status"
-        >
-          <span className="sr-only">Loading...</span>
-        </div>
+        <Load />
         <p className="text-gray-500 text-lg ml-4">Loading your courses...</p>
       </div>
     );

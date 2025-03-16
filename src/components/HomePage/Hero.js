@@ -3,10 +3,12 @@ import Image from "next/image";
 import DownwardButton from "./DownButton";
 import Modal from "../popupVideo/popup"; // Updated Modal import
 import myImage from "./../../../public/images/bgimg.jpg";
+import AuthPopup from "@/app/auth/AuthPopup";
 
 const Hero = () => {
   const [isTeacherModalOpen, setIsTeacherModalOpen] = useState(false);
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
 
 
   const teacherVideoUrl =

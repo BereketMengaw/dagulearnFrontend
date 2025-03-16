@@ -115,6 +115,8 @@ const MyCourses = () => {
                           <Image
                             src={thumbnailUrl}
                             alt={course.title}
+                            height={100}
+                            width={100}
                             className="w-full h-40 object-cover rounded-md mb-4"
                           />
                         ) : (
