@@ -3,6 +3,8 @@
 
 import { useEffect, useState } from "react";
 import CourseCard from "../components/HomePage/CourseCard";
+import { Button } from "@/components/ui/button";
+
 import Hero from "../components/HomePage/Hero";
 import { fetchCourses } from "../lib/fetcher";
 import Category from "@/components/HomePage/Category";
@@ -23,6 +25,7 @@ const HomePage = () => {
         <Navbar />
         <Hero />
         <Category />
+        <Button variant="outline">Button</Button>
       </div>
     </>
   );
