@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar/Navbar";
@@ -81,6 +83,8 @@ const CreatorDashboard = () => {
   return (
     <>
       <Navbar />
+      <Button variant="outline">Button</Button>
+
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col items-center p-4 md:p-8">
         <header className="w-full max-w-6xl bg-white p-8 rounded-2xl shadow-lg mb-8 text-center md:text-left transition-shadow hover:shadow-xl">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">

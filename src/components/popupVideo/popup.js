@@ -16,8 +16,8 @@ const Modal = ({ isOpen, onClose, videoUrl }) => {
           <iframe
             className="w-full h-64 sm:h-80 lg:h-96 rounded-lg"
             src={videoUrl}
-            title="YouTube Video"
-            frameBorder="0"
+            title="Introduction"
+            frameBorder="10"
             allowFullScreen
           ></iframe>
         </div>

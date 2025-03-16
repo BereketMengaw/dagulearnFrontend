@@ -134,7 +134,7 @@ export default function ChapterPage() {
                   const embedUrl = extractVideoId(video.url)
                     ? `https://www.youtube.com/embed/${extractVideoId(
                         video.url
-                      )}`
+                      )}?playlist=${extractVideoId(video.url)}&loop=1&rel=0`
                     : null;
 
                   return (

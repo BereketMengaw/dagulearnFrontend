@@ -8,8 +8,13 @@ const Hero = () => {
   const [isTeacherModalOpen, setIsTeacherModalOpen] = useState(false);
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
 
-  const teacherVideoUrl = "https://www.youtube.com/embed/lj2z4yqhkIE";
-  const studentVideoUrl = "https://www.youtube.com/embed/lj2z4yqhkIE";
+
+  const teacherVideoUrl =
+    "https://www.youtube.com/embed/lj2z4yqhkIE?playlist=lj2z4yqhkIE&loop=1&rel=0";
+
+  const studentVideoUrl =
+    "https://www.youtube.com/embed/lj2z4yqhkIE?playlist=lj2z4yqhkIE&loop=1&rel=0";
+
 
   return (
     <>
@@ -43,9 +48,9 @@ const Hero = () => {
 
           {/* Right Side Image */}
           <div className="lg:w-1/2 flex justify-center lg:justify-end">
-            <div className="relative w-48 h-48 sm:w-64 sm:h-64 lg:w-80 lg:h-80 rounded-full overflow-hidden shadow-lg md:mt-3">
+            <div className="relative w-48 h-48 sm:w-64 sm:h-64 lg:w-80 lg:h-80 rounded-full overflow-hidden  md:mt-3">
               <Image
-                src="/images/hero2.png" // Replace with your image path
+                src="/images/hero3.png" // Replace with your image path
                 alt="Learning Image"
                 fill
                 className="w-full h-full object-cover"
