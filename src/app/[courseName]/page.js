@@ -1,36 +1,65 @@
+"use client";
+import { useState, useEffect } from "react";
+import React from "react";
 import { fetchCourseByName, fetchChaptersByCourseId } from "@/lib/fetcher";
 import CourseDetails from "@/components/coursePage/CourseDetails";
 import Navbar from "@/components/Navbar/Navbar";
+import AuthPopup from "@/app/auth/AuthPopup";
 
 export const dynamic = "force-dynamic"; // Ensures fresh data on each request
 
-export default async function CoursePage({ params: rawParams }) {
-  // Ensure params is awaited before use
-  const params = await rawParams;
-  const courseName = decodeURIComponent(params.courseName);
+export default function CoursePage({ params }) {
+  const [course, setCourse] = useState(null);
+  const [chapters, setChapters] = useState(null);
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
+  const [error, setError] = useState(null);
 
-  console.log("Fetching course:", courseName);
+  // Use React.use() to unwrap params
+  const { courseName } = React.use(params);
 
-  if (!courseName) {
-    return <div className="text-center mt-10 text-red-500">Invalid course</div>;
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      if (!courseName) {
+        setError("Invalid course");
+        return;
+      }
+
+      try {
+        const courseData = await fetchCourseByName(courseName);
+        if (!courseData) {
+          setError("Course not found");
+          return;
+        }
+
+        const chaptersData = await fetchChaptersByCourseId(courseData.id);
+
+        setCourse(courseData);
+        setChapters(chaptersData);
+      } catch (err) {
+        setError("An error occurred while fetching course data.");
+      }
+    };
+
+    fetchCourseData();
+  }, [courseName]); // Fetch the data when the course name changes
+
+  if (error) {
+    return <div className="text-center mt-10 text-red-500">{error}</div>;
   }
 
-  // Fetch course by name
-  const course = await fetchCourseByName(courseName);
-
-  if (!course) {
-    return (
-      <div className="text-center mt-10 text-red-500">Course not found</div>
-    );
+  if (!course || !chapters) {
+    return <div className="text-center mt-10 text-gray-500">Loading...</div>;
   }
-
-  // Fetch chapters using the course ID
-  const chapters = await fetchChaptersByCourseId(course.id);
-  console.log(course);
 
   return (
     <div>
-      <Navbar className="bg-green bg-red-400" />
+      <Navbar setShowAuthPopup={setShowAuthPopup} />
+      {showAuthPopup && (
+        <AuthPopup
+          setShowAuthPopup={setShowAuthPopup}
+          onClose={() => setShowAuthPopup(false)}
+        />
+      )}
       <CourseDetails course={course} chapters={chapters} />
     </div>
   );
