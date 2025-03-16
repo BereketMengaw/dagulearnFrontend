@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react"; // Icon from lucide-react
+import User from "./UserNav";
 
 const Navbar = ({ setShowAuthPopup }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -63,84 +64,13 @@ const Navbar = ({ setShowAuthPopup }) => {
           )}
 
           {/* Show "Creator" button only for logged-in users with role "creator" */}
-          {userData && userData.role === "creator" && (
-            <div className="relative">
-              <button
-                onClick={toggleDropdown}
-                className="hover:text-blue-500 cursive-regular"
-              >
-                Creator
-              </button>
 
-              {/* Creator Dropdown */}
-              {isDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white border rounded-md shadow-lg z-50 cursive-regular">
-                  <Link
-                    href="/creator-dashboard/register"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    Creator Info
-                  </Link>
-                  <Link
-                    href="/creator-dashboard"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    Creator Dashboard
-                  </Link>
-                  <Link
-                    href="/creator-agreement"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    Creator Agreement
-                  </Link>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Show "Hello, [Name]" and avatar dropdown for logged-in users */}
-          {userData && (
-            <div className="relative flex items-center space-x-2">
-              <span className="text-black cursive-regular ">
-                Hello, {userName}
-              </span>
-
-              <button
-                onClick={toggleAvatarDropdown}
-                className="focus:outline-none"
-              >
-                <span
-                  role="img"
-                  aria-label="avatar"
-                  className="text-2xl bg-gray-200 rounded-full p-2 text-gray-800"
-                >
-                  🧑‍🎓
-                </span>
-              </button>
-
-              {/* Avatar Dropdown */}
-              {isAvatarDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
-                  <Link
-                    href="/dashboard"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    Dashboard
-                  </Link>
-                  <button
-                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-red-600"
-                    onClick={() => {
-                      localStorage.removeItem("user");
-                      setUserData(null); // Clear user data
-                      setUserName("Guest"); // Reset username
-                    }}
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
+          <User
+            userData={userData}
+            userName={userName}
+            setUserData={setUserData}
+            setUserName={setUserName}
+          />
         </div>
 
         {/* Mobile Menu Button */}

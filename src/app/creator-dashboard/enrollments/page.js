@@ -87,10 +87,6 @@ export default function EnrollmentsPage() {
               `${apiUrl}/api/enrollments/course/${course.id}`
             );
             if (!response.ok) {
-              console.error(
-                `Failed to fetch enrollments for course ${course.id}:`,
-                response.statusText
-              );
               continue;
             }
 
