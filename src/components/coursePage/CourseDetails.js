@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import useCheckCreator from "@/hooks/userCheckMiddleware";
 import Image from "next/image";
 
-export default function CourseDetails({ course, chapters }) {
+export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
   const [formData, setFormData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
@@ -124,8 +124,9 @@ export default function CourseDetails({ course, chapters }) {
 
   const handleBuy = async () => {
     if (!user) {
-      setButtonMessage("You need to login/signup  to buy this course.");
+      setShowAuthPopup(true);
       setTimeout(() => setButtonMessage("Buy Now"), 5000);
+
       return;
     }
 
@@ -173,13 +174,12 @@ export default function CourseDetails({ course, chapters }) {
   };
 
   const handleChapterClick = (chapter) => {
-    if (!user) {
-      setErrorMessage("You need to log in to access the chapters.");
-      return;
+    const isAdmin = false;
+    const isCreator = false;
+    if (user) {
+      const isAdmin = user.role === "admin";
+      const isCreator = user.userId === course.creatorId;
     }
-
-    const isAdmin = user.role === "admin";
-    const isCreator = user.userId === course.creatorId;
 
     if (isAdmin || isCreator || isEnrolled || chapter.order === 1) {
       router.push(`/courses/${courseId}/chapters/${chapter.order}`);
@@ -317,7 +317,7 @@ export default function CourseDetails({ course, chapters }) {
         <div className="text-center mt-8">
           {isEnrolled ? (
             <button
-              className="bg-green-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-green-700 transition"
+              className=" rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-3 font-semibold text-white shadow-lg hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:scale-105"
               disabled
             >
               You Are Ready to Learn
@@ -332,7 +332,7 @@ export default function CourseDetails({ course, chapters }) {
               }`}
               disabled={loading}
             >
-              {loading ? "Processing..." : buttonMessage} {price} ETB
+              {loading ? "Redirect to Chapa ..." : buttonMessage} {price} ETB
             </button>
           )}
         </div>

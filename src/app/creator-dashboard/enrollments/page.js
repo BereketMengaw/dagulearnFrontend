@@ -4,6 +4,17 @@ import Navbar from "@/components/Navbar/Navbar";
 import { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
+import Load from "@/components/load/page";
+import {
+  Table,
+  TableCaption,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table"; // Import the table components
+
 export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 import useCheckCreator from "@/hooks/userCheckMiddleware"; // ✅ Import the middleware
 
@@ -122,7 +133,7 @@ export default function EnrollmentsPage() {
   if (loading)
     return (
       <div className="flex justify-center items-center h-screen">
-        <ClipLoader color="#4A90E2" size={50} />
+        <Load />
       </div>
     );
 
@@ -154,7 +165,7 @@ export default function EnrollmentsPage() {
     <>
       <Navbar />
       <div className="max-w-4xl mx-auto bg-gradient-to-br from-blue-50 to-white rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold mb-6 text-gray-800">
+        <h1 className="text-3xl font-bold mb-6 text-gray-800 mx-10">
           My Course Enrollments
         </h1>
         <div className="space-y-8">
@@ -180,53 +191,38 @@ export default function EnrollmentsPage() {
                     Course Title: {course.title}
                   </h2>
                   <p className="text-gray-600">{course.description}</p>
-                  <div className="overflow-x-auto shadow-md sm:rounded-lg">
-                    <table className="min-w-full text-sm text-left text-gray-500">
-                      <thead className="text-xs text-gray-700 uppercase bg-gray-100">
-                        <tr>
-                          <th scope="col" className="px-6 py-3">
-                            User ID
-                          </th>
-                          <th scope="col" className="px-6 py-3">
-                            Price
-                          </th>
-                          <th scope="col" className="px-6 py-3">
-                            Enrolled At
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {courseEnrollments.length === 0 ? (
-                          <tr>
-                            <td
-                              colSpan="3"
-                              className="text-center py-4 text-gray-500"
-                            >
-                              No enrollments found for this course.
-                            </td>
-                          </tr>
-                        ) : (
-                          courseEnrollments.map((enrollment) => (
-                            <tr
-                              key={enrollment.id}
-                              className="border-b hover:bg-gray-50 transition duration-200"
-                            >
-                              <td className="px-6 py-3">{enrollment.userId}</td>
-                              <td className="px-6 py-3">
-                                {enrollment.course.price} ETB
-                              </td>
-                              <td className="px-6 py-3">
-                                {new Date(
-                                  enrollment.createdAt
-                                ).toLocaleString()}
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                  <div className="mt-4 font-semibold text-lg text-green-600">
+                  <Table>
+                    <TableCaption>
+                      A list of your recent enrollments.
+                    </TableCaption>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>User ID</TableHead>
+                        <TableHead>Price</TableHead>
+                        <TableHead>Enrolled At</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {courseEnrollments.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan="3">
+                            No enrollments found for this course.
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        courseEnrollments.map((enrollment) => (
+                          <TableRow key={enrollment.id}>
+                            <TableCell>{enrollment.userId}</TableCell>
+                            <TableCell>{enrollment.course.price} ETB</TableCell>
+                            <TableCell>
+                              {new Date(enrollment.createdAt).toLocaleString()}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                  <div className="mt-4 font-semibold text-lg text-green-600 mx-16">
                     Total Earnings for this Course: {courseEarnings} ETB
                   </div>
                 </div>
@@ -247,9 +243,6 @@ export default function EnrollmentsPage() {
             Return to Dashboard
           </button>
         </div>
-        <footer className="mt-8 text-center text-gray-500">
-          <p>&copy; 2023 Your Company. All rights reserved.</p>
-        </footer>
       </div>
     </>
   );

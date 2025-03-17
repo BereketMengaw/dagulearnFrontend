@@ -73,6 +73,8 @@ export default function ChapterPage() {
           Number(chapterId)
         );
 
+        console.log(contentData, "this is the content");
+
         setContent({
           title: contentData.title || "Untitled Chapter",
           videos: contentData.videos || [],
@@ -120,14 +122,16 @@ export default function ChapterPage() {
     <>
       <Navbar />
       <div className="max-w-7xl mx-auto p-6 sm:p-8 bg-white rounded-lg shadow-lg space-y-8 mt-6">
-        <h1 className="text-4xl font-bold text-gray-800 text-center">
+        <h1 className="text-4xl font-bold text-gray-800 text-center rock-salt-regular">
           {content.title}
         </h1>
 
         {/* Videos Section */}
         {content.videos.length > 0 && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-semibold text-gray-700">Videos</h2>
+            <h2 className="text-2xl font-semibold text-gray-700 text-center rock-salt-regular">
+              Videos
+            </h2>
             <div className="flex justify-center">
               <div className="w-full lg:w-3/4 xl:w-2/3">
                 {content.videos.map((video) => {
@@ -140,16 +144,15 @@ export default function ChapterPage() {
                   return (
                     <div
                       key={video.id}
-                      className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow cursor-pointer"
+                      className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow cursor-pointer "
                       onClick={() => setSelectedVideo(video)} // Open modal on click
                     >
-                      <h3 className="text-xl font-medium text-gray-800 mb-2">
-                        {video.title}
+                      <h3 className="text-xl font-medium text-gray-800 mb-2 mx-16 rock-salt-regular underline text-center">
+                        video title : {video.title}
                       </h3>
                       {embedUrl ? (
-                        <div className="relative h-[75vh]">
-                          {" "}
-                          {/* 75% of viewport height */}
+                        <div className="relative h-[45vh] md:h-[50vh] lg:h-[75vh]">
+                          {/* Adjust height for different screen sizes */}
                           <iframe
                             className="w-full h-full rounded-lg"
                             src={embedUrl}
@@ -175,14 +178,19 @@ export default function ChapterPage() {
         {/* Links Section */}
         {Array.isArray(content.links) && content.links.length > 0 ? (
           <div className="space-y-6">
-            <h2 className="text-2xl font-semibold text-gray-700">Links</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <h2
+              className="text-2xl font-semibold text-gray-700 text-center rock-salt-regular
+            "
+            >
+              Links
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-center">
               {content.links.map((link) => (
                 <div
                   key={link.id || link.url}
                   className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow"
                 >
-                  <h3 className="text-xl font-medium text-gray-800 mb-2">
+                  <h3 className="text-xl font-medium text-gray-800 mb-2 ">
                     {link.title || "Untitled Link"}
                   </h3>
                   <a
