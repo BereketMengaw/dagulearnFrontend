@@ -65,7 +65,17 @@ export default function CoursePage({ params }) {
           onClose={() => setShowAuthPopup(false)}
         />
       )}
-      <CourseDetails course={course} chapters={chapters} />
+      <CourseDetails
+        course={course}
+        chapters={chapters}
+        setShowAuthPopup={setShowAuthPopup}
+      />
+      {showAuthPopup && (
+        <AuthPopup
+          setShowAuthPopup={setShowAuthPopup}
+          onClose={() => setShowAuthPopup(false)}
+        />
+      )}
     </div>
   );
 }

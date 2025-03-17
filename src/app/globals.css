@@ -224,3 +224,7 @@ body {
   font-weight: 400;
   font-style: normal;
 }
+
+[anim="glow"]:not(.toggled) {
+  animation: glow var(--ease-elastic-in-1) 600ms infinite alternate;
+}
