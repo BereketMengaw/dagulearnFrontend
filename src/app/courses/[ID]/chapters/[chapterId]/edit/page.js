@@ -8,6 +8,7 @@ import { fetchContentByChapterAndCourse } from "@/lib/fetcher";
 import Navbar from "@/components/Navbar/Navbar";
 import { apiUrl } from "@/lib/api";
 import { appUrl } from "@/app/creator-dashboard/register/page";
+import Load from "@/components/load/page";
 
 export default function UpdateChapterPage() {
   const params = useParams();
@@ -139,6 +140,8 @@ export default function UpdateChapterPage() {
         }
       );
 
+      alert("chapter title updated succussfully ");
+
       if (!response.ok) throw new Error("Failed to update chapter.");
     } catch (err) {
       alert("Error updating chapter");
@@ -178,14 +181,19 @@ export default function UpdateChapterPage() {
     router.push(`${appUrl}/creator-dashboard/${courseId}/create-chapters`);
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading)
+    return (
+      <div>
+        <Load />
+      </div>
+    );
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <>
       <Navbar />
       <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold mb-4">Update Chapter</h1>
+        <h1 className="text-2xl font-bold mb-4">Update Chapter {courseId}</h1>
 
         {/* Update Chapter Title */}
         <div className="mb-6">

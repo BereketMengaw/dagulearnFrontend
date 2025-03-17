@@ -73,6 +73,8 @@ export default function ChapterPage() {
           Number(chapterId)
         );
 
+        console.log(contentData, "this is the content");
+
         setContent({
           title: contentData.title || "Untitled Chapter",
           videos: contentData.videos || [],
@@ -143,13 +145,12 @@ export default function ChapterPage() {
                       className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow cursor-pointer"
                       onClick={() => setSelectedVideo(video)} // Open modal on click
                     >
-                      <h3 className="text-xl font-medium text-gray-800 mb-2">
+                      <h3 className="text-xl font-medium text-gray-800 mb-2 mx-16">
                         {video.title}
                       </h3>
                       {embedUrl ? (
-                        <div className="relative h-[75vh]">
-                          {" "}
-                          {/* 75% of viewport height */}
+                        <div className="relative h-[75vh] sm:h-[60vh] md:h-[50vh] lg:h-[75vh]">
+                          {/* Adjust height for different screen sizes */}
                           <iframe
                             className="w-full h-full rounded-lg"
                             src={embedUrl}

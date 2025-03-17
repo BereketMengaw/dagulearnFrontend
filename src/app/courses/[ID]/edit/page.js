@@ -199,6 +199,8 @@ export default function EditCoursePage() {
                   src={imagePreview || course.thumbnail}
                   alt="Thumbnail"
                   className="w-full h-40 object-cover mb-2 rounded"
+                  width={100}
+                  height={100}
                   unoptimized
                 />
               ) : null}
