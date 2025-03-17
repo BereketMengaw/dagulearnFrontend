@@ -30,6 +30,8 @@ export default function ChapterPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  console.log(content.title, "this is the content title");
+
   useEffect(() => {
     if (!courseId || !chapterId) return;
 
@@ -42,38 +44,43 @@ export default function ChapterPage() {
         const creatorId = courseData.creatorId;
         const user = JSON.parse(localStorage.getItem("user"));
 
-        setIsTrueCreator(user.userId === creatorId);
+        if (user) {
+          setIsTrueCreator(user.userId === creatorId);
+        }
 
-        if (!user) {
+        /*  if (!user && content.title !== "chapter 1") {
           setError("You need to log in to access this content.");
           setLoading(false);
           return;
-        }
-
-        if (chapterId !== "1") {
-          const enrollmentData = await checkUserEnrollment(
-            user.userId,
-            courseId
-          );
-          const isEnrolled = enrollmentData?.enrolled || false;
-
-          if (
-            !isEnrolled &&
-            user.userId !== creatorId &&
-            user.role !== "admin"
-          ) {
-            setError("You do not have access to this course.");
-            setLoading(false);
-            return;
-          }
-        }
+        }*/
 
         const contentData = await fetchContentByChapterAndCourse(
           Number(courseId),
           Number(chapterId)
         );
 
-        console.log(contentData, "this is the content");
+        if (content.title !== "chapter 1" && user) {
+          const enrollmentData = await checkUserEnrollment(
+            user.userId,
+            courseId
+          );
+
+          const isEnrolled = enrollmentData?.enrolled || false;
+
+          console.log(chapterId, "this is the chapter id");
+
+          if (
+            !isEnrolled &&
+            user.userId !== creatorId &&
+            user.role !== "admin" &&
+            chapterId !== "1"
+          ) {
+            setError("You do not have access to this course.");
+
+            setLoading(false);
+            return;
+          }
+        }
 
         setContent({
           title: contentData.title || "Untitled Chapter",
@@ -83,6 +90,7 @@ export default function ChapterPage() {
         });
       } catch (err) {
         setError("NO CONTENT IS UPLOADED FOR THIS CHAPTER");
+        console.log(err);
       } finally {
         setLoading(false);
       }
