@@ -5,6 +5,7 @@ import { fetchCourseByName, fetchChaptersByCourseId } from "@/lib/fetcher";
 import CourseDetails from "@/components/coursePage/CourseDetails";
 import Navbar from "@/components/Navbar/Navbar";
 import AuthPopup from "@/app/auth/AuthPopup";
+import Load from "@/components/load/page";
 
 export const dynamic = "force-dynamic"; // Ensures fresh data on each request
 
@@ -48,7 +49,11 @@ export default function CoursePage({ params }) {
   }
 
   if (!course || !chapters) {
-    return <div className="text-center mt-10 text-gray-500">Loading...</div>;
+    return (
+      <div>
+        <Load />
+      </div>
+    );
   }
 
   return (
