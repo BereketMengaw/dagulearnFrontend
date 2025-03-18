@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar/Navbar";
+export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -22,9 +23,7 @@ const UserManagement = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch(
-          "https://dagulearnbackend-production.up.railway.app/api/users"
-        );
+        const response = await fetch(`${apiUrl}/api/users`);
         if (!response.ok) {
           throw new Error("Failed to fetch users");
         }
@@ -55,10 +54,9 @@ const UserManagement = () => {
     if (!isConfirmed) return; // Exit if the user cancels
 
     try {
-      const response = await fetch(
-        `https://dagulearnbackend-production.up.railway.app/api/users/${userId}`,
-        { method: "DELETE" }
-      );
+      const response = await fetch(`${apiUrl}/api/users/${userId}`, {
+        method: "DELETE",
+      });
       if (!response.ok) {
         throw new Error("Failed to delete user");
       }
@@ -77,16 +75,13 @@ const UserManagement = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(
-        `https://dagulearnbackend-production.up.railway.app/api/users/${editingUser.id}`,
-        {
-          method: "PUT", // or "PATCH" depending on your API
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(editingUser),
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/users/${editingUser.id}`, {
+        method: "PUT", // or "PATCH" depending on your API
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(editingUser),
+      });
       if (!response.ok) {
         throw new Error("Failed to update user");
       }

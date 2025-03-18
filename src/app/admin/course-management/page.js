@@ -3,6 +3,7 @@
 import Navbar from "@/components/Navbar/Navbar";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export default function CourseManagement() {
   const router = useRouter();
@@ -26,9 +27,7 @@ export default function CourseManagement() {
 
   const fetchCourses = async () => {
     try {
-      const response = await fetch(
-        "https://dagulearnbackend-production.up.railway.app/api/courses"
-      );
+      const response = await fetch(`${apiUrl}/api/courses `);
       if (!response.ok) {
         throw new Error("Failed to fetch courses");
       }
@@ -50,12 +49,9 @@ export default function CourseManagement() {
     if (!isConfirmed) return; // Exit if the user cancels
 
     try {
-      const response = await fetch(
-        `https://dagulearnbackend-production.up.railway.app/api/courses/${courseId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/courses/${courseId}`, {
+        method: "DELETE",
+      });
       if (!response.ok) {
         throw new Error("Failed to delete course");
       }
@@ -75,7 +71,7 @@ export default function CourseManagement() {
     e.preventDefault();
     try {
       const response = await fetch(
-        `https://dagulearnbackend-production.up.railway.app/api/courses/${editingCourse.id}`,
+        `${apiUrl}/api/courses/${editingCourse.id}`,
         {
           method: "PUT", // or "PATCH" depending on your API
           headers: {

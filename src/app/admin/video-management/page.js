@@ -3,6 +3,7 @@
 import Navbar from "@/components/Navbar/Navbar";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export default function VideoManagement() {
   const router = useRouter();
@@ -26,9 +27,7 @@ export default function VideoManagement() {
 
   const fetchVideos = async () => {
     try {
-      const response = await fetch(
-        "https://dagulearnbackend-production.up.railway.app/api/videos"
-      );
+      const response = await fetch(`${apiUrl}/api/videos`);
       if (!response.ok) {
         throw new Error("Failed to fetch videos");
       }
@@ -50,12 +49,9 @@ export default function VideoManagement() {
     if (!isConfirmed) return; // Exit if the user cancels
 
     try {
-      const response = await fetch(
-        `https://dagulearnbackend-production.up.railway.app/api/videos/${videoId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/videos/${videoId}`, {
+        method: "DELETE",
+      });
       if (!response.ok) {
         throw new Error("Failed to delete video");
       }
@@ -74,16 +70,13 @@ export default function VideoManagement() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(
-        `https://dagulearnbackend-production.up.railway.app/api/videos/${editingVideo.id}`,
-        {
-          method: "PUT", // or "PATCH" depending on your API
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(editingVideo),
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/videos/${editingVideo.id}`, {
+        method: "PUT", // or "PATCH" depending on your API
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(editingVideo),
+      });
       if (!response.ok) {
         throw new Error("Failed to update video");
       }

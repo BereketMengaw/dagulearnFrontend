@@ -3,6 +3,7 @@
 import Navbar from "@/components/Navbar/Navbar";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export default function EarningsManagement() {
   const router = useRouter();
@@ -25,9 +26,7 @@ export default function EarningsManagement() {
 
   const fetchEarnings = async () => {
     try {
-      const response = await fetch(
-        "https://dagulearnbackend-production.up.railway.app/api/earnings"
-      );
+      const response = await fetch(`${apiUrl}/api/earnings`);
       if (!response.ok) throw new Error("Failed to fetch earnings");
 
       const data = await response.json();
@@ -52,7 +51,7 @@ export default function EarningsManagement() {
       const details = {};
       for (const creatorId of creatorIds) {
         const response = await fetch(
-          `https://dagulearnbackend-production.up.railway.app/api/creator/creators/${creatorId}`
+          `${apiUrl}/api/creator/creators/${creatorId}`
         );
         if (!response.ok)
           throw new Error(`Failed to fetch details for creator ${creatorId}`);

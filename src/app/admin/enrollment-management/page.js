@@ -3,6 +3,7 @@
 import Navbar from "@/components/Navbar/Navbar";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export default function EnrollmentManagement() {
   const [enrollments, setEnrollments] = useState([]);
@@ -32,9 +33,7 @@ export default function EnrollmentManagement() {
 
   const fetchEnrollments = async () => {
     try {
-      const response = await fetch(
-        "https://dagulearnbackend-production.up.railway.app/api/enrollments"
-      );
+      const response = await fetch(`${apiUrl}/api/enrollments`);
       if (!response.ok) {
         throw new Error("Failed to fetch enrollments");
       }
@@ -57,7 +56,7 @@ export default function EnrollmentManagement() {
 
     try {
       const response = await fetch(
-        `https://dagulearnbackend-production.up.railway.app/api/enrollments/${enrollmentId}`,
+        `${apiUrl}/api/enrollments/${enrollmentId}`,
         {
           method: "DELETE",
         }
@@ -83,7 +82,7 @@ export default function EnrollmentManagement() {
     e.preventDefault();
     try {
       const response = await fetch(
-        `https://dagulearnbackend-production.up.railway.app/api/enrollments/${editingEnrollment.id}`,
+        `${apiUrl}/api/enrollments/${editingEnrollment.id}`,
         {
           method: "PUT", // or "PATCH" depending on your API
           headers: {
@@ -129,16 +128,13 @@ export default function EnrollmentManagement() {
   const handleAddEnrollment = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(
-        "https://dagulearnbackend-production.up.railway.app/api/enrollments",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newEnrollment),
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/enrollments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newEnrollment),
+      });
       if (!response.ok) {
         throw new Error("Failed to add enrollment");
       }
