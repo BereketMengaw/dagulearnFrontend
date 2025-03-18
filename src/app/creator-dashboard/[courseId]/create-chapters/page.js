@@ -284,7 +284,7 @@ const ChapterAndVideoForm = () => {
       <Link href={`/courses/${courseId}/edit`}>
         <button
           type="button"
-          className="px-4 py-2 bg-green-500 text-white rounded"
+          className="px-4 py-2 bg-green-500 text-white rounded mx-16 my-12"
           disabled={isLoading || chapters.length === 0}
         >
           Update Course

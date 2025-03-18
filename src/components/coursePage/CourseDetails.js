@@ -17,6 +17,8 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
   const [gmail, setgmail] = useState(null);
   const [createId, setCreateId] = useState(null);
   const [creator, setCreator] = useState({});
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isCreator, setIsCreator] = useState(false);
 
   const router = useRouter();
 
@@ -26,15 +28,25 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
 
   console.log(realCreat, "this is creator id number");
 
+  // Fetch user from localStorage
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedUser = JSON.parse(localStorage.getItem("user"));
-      setUser(storedUser);
+      if (storedUser) {
+        setUser(storedUser);
+      }
     }
   }, []);
 
-  console.log({ creator }, "this is the creator");
+  // Check if user is admin or creator
+  useEffect(() => {
+    if (user) {
+      setIsAdmin(user.role === "admin");
+      setIsCreator(user.userId === course.creatorId);
+    }
+  }, [user, course.creatorId]);
 
+  // Fetch creator details
   useEffect(() => {
     if (!realCreat) {
       setLoading(false);
@@ -55,10 +67,8 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
 
         if (response.ok) {
           const data = await response.json();
-          console.log(data.creator, "this is the ");
           if (data.creator) {
             setCreator(data.creator);
-            console.log(data.creator, "this is the defined");
           }
         }
       } catch (error) {
@@ -71,9 +81,7 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
     checkCreator();
   }, [realCreat]);
 
-  console.log(creator, "this is the form data");
-
-  //to get basic info of creator
+  // Fetch creator's basic info
   useEffect(() => {
     if (!creator?.userId) return;
 
@@ -88,7 +96,6 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
         }
         const data = await response.json();
         setUserNew(data);
-        console.log(data.data.name, "this is the user new");
         setgmail(data.data.gmail);
         setName(data.data.name);
       } catch (err) {
@@ -101,7 +108,7 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
     fetchCreatorInfo();
   }, [creator?.userId, realCreat]);
 
-  //to check enrollment
+  // Check if user is enrolled in the course
   useEffect(() => {
     const checkEnrollment = async () => {
       if (user && courseId) {
@@ -109,12 +116,13 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/api/enrollments/check/${user.userId}/${courseId}`
           );
-          const data = await response.json();
-          if (data.enrolled) {
-            setIsEnrolled(true);
+          if (!response.ok) {
           }
+          const data = await response.json();
+          setIsEnrolled(data.enrolled);
         } catch (error) {
           console.error("Error checking enrollment:", error);
+          setIsEnrolled(false); // Default to false if there's an error
         }
       }
     };
@@ -122,12 +130,12 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
     checkEnrollment();
   }, [courseId, user]);
 
+  // Handle Buy Now button click
   const handleBuy = async () => {
     if (!user) {
       setShowAuthPopup(true);
       setTimeout(() => setButtonMessage("Buy Now"), 5000);
-
-      return;
+      return; // Exit the function early
     }
 
     const { name, phoneNumber, userId, gmail } = user;
@@ -173,14 +181,8 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
     }
   };
 
+  // Handle chapter click
   const handleChapterClick = (chapter) => {
-    const isAdmin = false;
-    const isCreator = false;
-    if (user) {
-      const isAdmin = user.role === "admin";
-      const isCreator = user.userId === course.creatorId;
-    }
-
     if (isAdmin || isCreator || isEnrolled || chapter.order === 1) {
       router.push(`/courses/${courseId}/chapters/${chapter.order}`);
     } else {
@@ -190,6 +192,7 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
     }
   };
 
+  // Handle update course button click
   const handleUpdateCourse = () => {
     router.push(`/courses/${courseId}/edit`);
   };
@@ -208,7 +211,6 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
     <div className="min-h-screen bg-gradient-to-r from-blue-50 to-indigo-100 py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* User and Creator Info Section */}
-
         <div className="bg-white mb-3 dark:bg-gray-800 flex justify-center rounded-xl shadow-2xl max-w-4xl w-full p-8 transition-all duration-300 animate-fade-in">
           <div className="flex flex-col md:flex-row">
             {/* Profile Picture on the Left */}
@@ -317,7 +319,7 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
         <div className="text-center mt-8">
           {isEnrolled ? (
             <button
-              className=" rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-3 font-semibold text-white shadow-lg hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:scale-105"
+              className="rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-3 font-semibold text-white shadow-lg hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:scale-105"
               disabled
             >
               You Are Ready to Learn
@@ -353,10 +355,7 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
                 <li
                   key={chapter.id}
                   className={`p-6 rounded-lg ${
-                    user?.role === "admin" ||
-                    user?.userId === course.creatorId ||
-                    isEnrolled ||
-                    chapter.order === 1
+                    isAdmin || isCreator || isEnrolled || chapter.order === 1
                       ? "bg-green-100 hover:bg-green-200 cursor-pointer"
                       : "bg-gray-100 hover:bg-gray-200 cursor-not-allowed"
                   } transition-all`}
@@ -387,7 +386,7 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
         </div>
 
         {/* Update Course Button for Admin and Creator */}
-        {(user?.role === "admin" || user?.userId === course.creatorId) && (
+        {(isAdmin || isCreator) && (
           <div className="text-center mt-8">
             <button
               onClick={handleUpdateCourse}

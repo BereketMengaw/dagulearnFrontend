@@ -1,12 +1,10 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar/Navbar";
 import { fetchCategories } from "@/lib/fetcher";
 import useCheckCreator from "@/hooks/userCheckMiddleware"; // ✅ Import the middleware
 import Load from "@/components/load/page";
-import Celebration from "@/components/celebration/page";
 
 export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -26,16 +24,13 @@ export default function CourseCreate() {
   const [created, setCreated] = useState(false);
 
   // Retrieve user data from localStorage
-
   useEffect(() => {
-    // This will run only on the client-side
     if (typeof window !== "undefined") {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
         setUserData(parsedUser);
         setCreatorId(parsedUser.userId);
-      } else {
       }
     }
   }, [router]);
@@ -46,11 +41,10 @@ export default function CourseCreate() {
   );
 
   useEffect(() => {
-    // If creator check is done and user is not a creator or no creator data, redirect
     if (!checkingCreator && (creator === false || creator === null)) {
       alert("First fill creator information.");
       router.push(
-        "${process.env.NEXT_PUBLIC_APP_URL}/creator-dashboard/register"
+        `${process.env.NEXT_PUBLIC_APP_URL}/creator-dashboard/register`
       );
     }
   }, [checkingCreator, creator, router]);
@@ -84,13 +78,27 @@ export default function CourseCreate() {
         throw new Error("User not found.");
       }
 
+      // Step 1: Fetch all courses
+      const response = await fetch(`${apiUrl}/api/courses`);
+      const allCourses = await response.json();
+
+      // Step 2: Check if a course with the same title already exists
+      const isDuplicate = allCourses.some(
+        (course) =>
+          course.title.toLowerCase() === courseData.title.toLowerCase()
+      );
+
+      if (isDuplicate) {
+        throw new Error("A course with this title already exists.");
+      }
+
+      // Step 3: Create the course if the title is unique
       const coursePayload = {
         ...courseData,
         creatorId: userData.userId,
       };
 
-      // Step 1: Create Course
-      const response = await fetch(`${apiUrl}/api/courses/`, {
+      const createResponse = await fetch(`${apiUrl}/api/courses/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -98,8 +106,8 @@ export default function CourseCreate() {
         body: JSON.stringify(coursePayload),
       });
 
-      const data = await response.json();
-      if (!response.ok) {
+      const data = await createResponse.json();
+      if (!createResponse.ok) {
         throw new Error(data.message || "Failed to create course.");
       }
 
@@ -125,7 +133,7 @@ export default function CourseCreate() {
     <>
       <Navbar />
       <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8 bg-gradient-to-r from-blue-50 to-indigo-100 shadow-2xl rounded-xl space-y-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 text-center cursive-regular ">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 text-center cursive-regular">
           Create a New Course
         </h1>
 
@@ -151,7 +159,7 @@ export default function CourseCreate() {
               value={courseData.title}
               onChange={handleChange}
               required
-              className="bg-gray-50 borde text-blue-800 text-sm rounded-lg  focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+              className="bg-gray-50 borde text-blue-800 text-sm rounded-lg  focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
               placeholder="Enter course title"
             />
           </div>
@@ -238,7 +246,7 @@ export default function CourseCreate() {
               }`}
               disabled={loading}
             >
-              {loading ? "Creating..." : "Create Course"}
+              {loading ? "Creating a course ..." : "Create Course"}
             </button>
           </div>
         </form>
