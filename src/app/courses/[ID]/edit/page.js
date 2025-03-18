@@ -151,11 +151,13 @@ export default function EditCoursePage() {
       <Navbar />
 
       <div className="min-h-screen bg-gray-100 py-8">
-        <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
-          <h1 className="text-2xl font-bold mb-6 text-center">Edit Course</h1>
+        <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+          <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
+            Edit Course
+          </h1>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Title:
               </label>
               <input
@@ -163,23 +165,23 @@ export default function EditCoursePage() {
                 name="title"
                 value={course.title}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Description:
               </label>
               <textarea
                 name="description"
                 value={course.description}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 rows="4"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Price:
               </label>
               <input
@@ -187,34 +189,34 @@ export default function EditCoursePage() {
                 name="price"
                 value={course.price}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Thumbnail:
               </label>
               {imagePreview || course.thumbnail ? (
                 <Image
                   src={imagePreview || course.thumbnail}
                   alt="Thumbnail"
-                  className="w-full h-40 object-cover mb-2 rounded"
-                  width={100}
-                  height={100}
+                  className="w-full h-48 object-cover mb-4 rounded-lg shadow-md"
+                  width={200}
+                  height={200}
                   unoptimized
                 />
               ) : null}
               <input
                 type="file"
                 onChange={handleImageChange}
-                className="mt-1 block w-full"
+                className="mt-1 block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
               />
             </div>
             {canEdit && (
               <div>
                 <button
                   type="submit"
-                  className="w-full bg-indigo-600 text-white px-4 py-2 rounded-md"
+                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300"
                 >
                   Update Course
                 </button>
@@ -224,29 +226,34 @@ export default function EditCoursePage() {
           {canDelete && (
             <button
               onClick={handleDelete}
-              className="mt-4 w-full bg-red-600 text-white px-4 py-2 rounded-md"
+              className="mt-4 w-full bg-gradient-to-r from-red-600 to-pink-600 text-white px-4 py-2 rounded-lg hover:from-red-700 hover:to-pink-700 transition-all duration-300"
             >
               Delete Course
             </button>
           )}
 
           {/* Display chapters or a message if no chapters are available */}
-          <div className="max-w-2xl mx-auto mt-8">
-            <h2 className="text-xl font-bold mb-4">Chapters</h2>
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">Chapters</h2>
             {chapters.length > 0 ? (
               <ul className="space-y-4">
                 {chapters.map((chapter) => (
                   <li
                     key={chapter.id}
-                    className="bg-white p-4 rounded-md shadow-md"
+                    className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
                   >
-                    <div className="flex justify-between">
-                      <span>chapter title: {chapter.title}</span>
-                      <span>chapter order :{chapter.order}</span>
-
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <span className="text-lg font-semibold text-gray-800">
+                          {chapter.title}
+                        </span>
+                        <span className="block text-sm text-gray-500">
+                          Order: {chapter.order}
+                        </span>
+                      </div>
                       <Link
                         href={`/courses/${Id}/chapters/${chapter.order}/edit`}
-                        className="text-indigo-600 hover:text-indigo-800"
+                        className="text-indigo-600 hover:text-indigo-800 font-semibold"
                       >
                         Edit Chapter
                       </Link>
@@ -259,27 +266,19 @@ export default function EditCoursePage() {
                       `${process.env.NEXT_PUBLIC_APP_URL}/${course.title}`
                     )
                   }
-                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition"
+                  className="w-full bg-gradient-to-r from-green-600 to-teal-600 text-white px-4 py-2 rounded-lg hover:from-green-700 hover:to-teal-700 transition-all duration-300"
                 >
-                  check course
+                  Check Course
                 </button>
               </ul>
             ) : (
-              <div>
-                <button
-                  onClick={() =>
-                    router.push(
-                      `${process.env.NEXT_PUBLIC_APP_URL}/${updatedData.title}`
-                    )
-                  }
-                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition"
-                >
-                  check course
-                </button>
-                <p>No chapters available for this course.</p>
+              <div className="text-center">
+                <p className="text-gray-600 mb-4">
+                  No chapters available for this course.
+                </p>
                 <Link
                   href={`/creator-dashboard/${Id}/create-chapters`}
-                  className="mt-4 inline-block bg-indigo-600 text-white px-6 py-2 rounded-md"
+                  className="inline-block bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300"
                 >
                   Add Chapter
                 </Link>

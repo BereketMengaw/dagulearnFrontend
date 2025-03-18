@@ -8,6 +8,7 @@ import {
 } from "@/lib/fetcher";
 import Navbar from "@/components/Navbar/Navbar";
 import { appUrl } from "@/app/creator-dashboard/register/page";
+import AuthPopup from "@/app/auth/AuthPopup";
 
 const extractVideoId = (url) => {
   const regex =
@@ -18,6 +19,7 @@ const extractVideoId = (url) => {
 
 export default function ChapterPage() {
   const params = useParams();
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
   const { ID: courseId, chapterId } = params || {};
   const [isTrueCreator, setIsTrueCreator] = useState();
   const [selectedVideo, setSelectedVideo] = useState(null); // Track selected video for modal
@@ -42,6 +44,7 @@ export default function ChapterPage() {
       try {
         const courseData = await fetchCourseById(Number(courseId));
         const creatorId = courseData.creatorId;
+
         const user = JSON.parse(localStorage.getItem("user"));
 
         if (user) {
@@ -118,7 +121,13 @@ export default function ChapterPage() {
   if (error) {
     return (
       <>
-        <Navbar />
+        <Navbar setShowAuthPopup={setShowAuthPopup} />
+        {showAuthPopup && (
+          <AuthPopup
+            setShowAuthPopup={setShowAuthPopup}
+            onClose={() => setShowAuthPopup(false)}
+          />
+        )}
         <div className="flex justify-center items-center h-screen">
           <p className="text-center text-red-500 font-semibold">{error}</p>
         </div>
@@ -128,7 +137,14 @@ export default function ChapterPage() {
 
   return (
     <>
-      <Navbar />
+      <Navbar setShowAuthPopup={setShowAuthPopup} />
+      {showAuthPopup && (
+        <AuthPopup
+          setShowAuthPopup={setShowAuthPopup}
+          onClose={() => setShowAuthPopup(false)}
+        />
+      )}
+
       <div className="max-w-7xl mx-auto p-6 sm:p-8 bg-white rounded-lg shadow-lg space-y-8 mt-6">
         <h1 className="text-4xl font-bold text-gray-800 text-center rock-salt-regular">
           {content.title}
