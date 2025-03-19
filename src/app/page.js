@@ -36,7 +36,7 @@ const HomePage = () => {
 
         <Hero />
         <Category />
-        <Button variant="outline">Button</Button>
+     
       </div>
     </>
   );
