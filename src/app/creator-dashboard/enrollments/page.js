@@ -222,9 +222,7 @@ export default function EnrollmentsPage() {
                       )}
                     </TableBody>
                   </Table>
-                  <div className="mt-4 font-semibold text-lg text-green-600 mx-16">
-                    Total Earnings for this Course: {courseEarnings} ETB
-                  </div>
+                
                 </div>
               );
             })
