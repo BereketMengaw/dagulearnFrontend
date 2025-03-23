@@ -100,7 +100,7 @@ const CreatorRegistrationForm = () => {
 
       if (response.data.success) {
         alert("Creator registration successful!");
-        router.push("/creator-dashboard");
+        router.push("/creator-dashboard/register");
       } else {
         setErrors({
           general: response.data.message || "Something went wrong.",
@@ -238,7 +238,7 @@ const CreatorRegistrationForm = () => {
             className="w-full p-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all duration-200 disabled:opacity-50"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Submitting..." : "Join Astemari 🚀"}
+            {isSubmitting ? "Submitting..." : "Update Profile"}
           </button>
         </form>
       </div>

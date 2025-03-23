@@ -229,17 +229,25 @@ const CreatorRegistrationForm = () => {
         {!isEditing && creator ? (
           <div className="text-gray-700 space-y-4">
             <div className="flex flex-col items-center">
-              <p className="font-bold mb-2">Profile Picture:</p>
-              {creator.profilePicture && (
-                <Image
-                  src={`${apiUrl}${creator.profilePicture}`}
-                  alt="Profile"
-                  width={100}
-                  height={100}
-                  className="w-32 h-32 rounded-full object-cover border border-gray-300"
-                  unoptimized
-                />
-              )}
+              <div className="flex flex-col items-center">
+                {creator.profilePicture ? (
+                  <Image
+                    src={`${apiUrl}${creator.profilePicture}`}
+                    alt="Profile"
+                    width={100}
+                    height={100}
+                    className="w-32 h-32 rounded-full object-cover border border-gray-300"
+                    unoptimized
+                  />
+                ) : (
+                  <div>
+                    <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center border border-gray-300">
+                      <span className="text-gray-500 text-sm">No Image</span>
+                    </div>
+                    <div>Update your profile</div>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <p>
@@ -285,7 +293,7 @@ const CreatorRegistrationForm = () => {
             <div className="flex justify-center items-center mt-3">
               <Link href="/creator-dashboard">
                 <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold rounded-lg shadow-lg hover:from-blue-700 hover:to-blue-600 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                  Go to Creator Dashboard
+                  Go to Creator Dashboard (Join DaguLearn 🚀)
                 </button>
               </Link>
             </div>
@@ -294,7 +302,9 @@ const CreatorRegistrationForm = () => {
           <div className="space-y-6">
             {/* Profile Picture Section */}
             <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold mb-4">Profile Picture</h3>
+              <h3 className="text-xl font-semibold mb-4">
+                Profile Picture (1MB MAX)
+              </h3>
               <div className="flex flex-col items-center space-y-4">
                 {formData?.profilePicture && (
                   <Image
@@ -305,6 +315,8 @@ const CreatorRegistrationForm = () => {
                     }
                     alt="Profile Preview"
                     className="w-32 h-32 rounded-full object-cover border border-gray-300"
+                    width={100}
+                    height={100}
                     unoptimized
                   />
                 )}
