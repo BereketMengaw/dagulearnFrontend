@@ -36,7 +36,6 @@ const HomePage = () => {
 
         <Hero />
         <Category />
-     
       </div>
     </>
   );

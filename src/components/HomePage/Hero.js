@@ -1,10 +1,20 @@
-import { useState } from "react";
+"use client";
+
 import Image from "next/image";
 import AuthPopup from "@/app/auth/AuthPopup";
+import { useRouter } from "next/navigation";
+
+import { useEffect, useState } from "react";
 
 const Hero = () => {
   const [showAuthPopup, setShowAuthPopup] = useState(false);
-  const storedUser = localStorage.getItem("user");
+  const [storedUser, setStoredUser] = useState(null);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      // Ensure it's running on the client
+      setStoredUser(localStorage.getItem("user"));
+    }
+  }, []);
 
   return (
     <section
