@@ -1,82 +1,83 @@
 import { useState } from "react";
 import Image from "next/image";
-import DownwardButton from "./DownButton";
-import Modal from "../popupVideo/popup"; // Updated Modal import
-import myImage from "./../../../public/images/bgimg.jpg";
 import AuthPopup from "@/app/auth/AuthPopup";
 
 const Hero = () => {
-  const [isTeacherModalOpen, setIsTeacherModalOpen] = useState(false);
-  const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
   const [showAuthPopup, setShowAuthPopup] = useState(false);
-
-
-  const teacherVideoUrl =
-    "https://www.youtube.com/embed/lj2z4yqhkIE?playlist=lj2z4yqhkIE&loop=1&rel=0";
-
-  const studentVideoUrl =
-    "https://www.youtube.com/embed/lj2z4yqhkIE?playlist=lj2z4yqhkIE&loop=1&rel=0";
-
+  const storedUser = localStorage.getItem("user");
 
   return (
-    <>
-      <div className="pb-2">
-        <section className="flex flex-col-reverse lg:flex-row items-center bg-no-repeat bg-cover bg-center h-1/2 py-5 px-6 lg:px-24">
-          {/* Left Side Text */}
-          <div className="lg:w-1/2 text-center lg:text-left space-y-4">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 leading-snug cedarville-cursive-regular">
-              Learn from Anyone, Teach Anything
-            </h1>
-            <p className="text-base sm:text-lg text-gray-600 cursive-regular big-shoulders-stencil">
-              Empowering educators and students to connect and share knowledge
-              for better, quality education. Experience seamless learning
-              opportunities from anywhere.
-            </p>
-            <div className="flex flex-col sm:flex-row sm:justify-center lg:justify-start gap-4">
-              <button
-                onClick={() => setIsTeacherModalOpen(true)}
-                className="px-6 sm:px-8 py-3 bg-blue-600 text-white text-sm sm:text-lg font-medium rounded-lg shadow-md hover:bg-blue-700 transition md:mt-4"
-              >
-                Be a Teacher
-              </button>
-              <button
-                onClick={() => setIsStudentModalOpen(true)}
-                className="px-6 sm:px-8 py-3 bg-blue-600 text-white text-sm sm:text-lg font-medium rounded-lg shadow-md hover:bg-blue-700 transition md:mt-4"
-              >
-                Start Learning
-              </button>
-            </div>
-          </div>
+    <section
+      className="relative h-screen flex items-center text-white bg-cover bg-center"
+      style={{
+        backgroundImage: "url('/images/bgimgtwo.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      {/* Dark Overlay - Always present */}
+      <div className="absolute inset-0 bg-black bg-opacity-50"></div>
 
-          {/* Right Side Image */}
-          <div className="lg:w-1/2 flex justify-center lg:justify-end">
-            <div className="relative w-48 h-48 sm:w-64 sm:h-64 lg:w-80 lg:h-80 rounded-full overflow-hidden  md:mt-3">
-              <Image
-                src="/images/hero3.png" // Replace with your image path
-                alt="Learning Image"
-                fill
-                className="w-full h-full object-cover"
-              />
-            </div>
+      {/* Gradient Overlay - Only on large screens */}
+      <div
+        className="absolute inset-0 hidden lg:block"
+        style={{
+          background:
+            "linear-gradient(to right, rgba(0, 0, 0, 1.3), rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0),rgba(0, 0, 0, 0),rgba(0, 0, 0, 0))",
+        }}
+      ></div>
+
+      <div className="container mx-auto px-6 lg:px-24 relative z-10 flex flex-col lg:flex-row items-center">
+        {/* Left Content */}
+        <div className="lg:w-1/2 text-center lg:text-left space-y-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-snug">
+            Welcome to Dagulearn Course Sharing Platform
+          </h1>
+          <p className="text-base sm:text-lg md:text-xl text-gray-300">
+            Empowering educators and students to connect and share knowledge for
+            better, quality education. Learn anytime, anywhere.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button
+              onClick={() =>
+                window.scrollTo({ top: window.innerHeight, behavior: "smooth" })
+              }
+              className="px-6 py-3 bg-purple-600 text-white font-medium rounded-lg shadow-md hover:bg-purple-700 transition"
+            >
+              Get Started
+            </button>
+            {/* Show Login button only if user is not logged in */}
+            {!storedUser && (
+              <button
+                onClick={() => setShowAuthPopup(true)}
+                className="px-6 py-3 border border-white text-white font-medium rounded-lg shadow-md hover:bg-white hover:text-black transition"
+              >
+                Sign Up / Login
+              </button>
+            )}
+
+            {/* Show Dashboard button if user is logged in */}
+            {storedUser && (
+              <button
+                onClick={() => {
+                  window.location.href = "/dashboard";
+                }}
+                className="px-6 py-3 border border-white text-white font-medium rounded-lg shadow-md hover:bg-white hover:text-black transition"
+              >
+                Dashboard
+              </button>
+            )}
           </div>
-        </section>
-        <DownwardButton />
+        </div>
+
+        {/* Right Image */}
+        <div className="lg:w-1/2 flex justify-center lg:justify-end"></div>
       </div>
 
-      {/* Teacher Modal */}
-      <Modal
-        isOpen={isTeacherModalOpen}
-        onClose={() => setIsTeacherModalOpen(false)}
-        videoUrl={teacherVideoUrl}
-      />
-
-      {/* Student Modal */}
-      <Modal
-        isOpen={isStudentModalOpen}
-        onClose={() => setIsStudentModalOpen(false)}
-        videoUrl={studentVideoUrl}
-      />
-    </>
+      {/* Auth Popup */}
+      {showAuthPopup && <AuthPopup onClose={() => setShowAuthPopup(false)} />}
+    </section>
   );
 };
 

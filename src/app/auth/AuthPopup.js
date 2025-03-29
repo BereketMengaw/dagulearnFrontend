@@ -157,7 +157,7 @@ const AuthPage = ({ onClose }) => {
             <TabsTrigger value="signup">Signup</TabsTrigger>
           </TabsList>
           <TabsContent value="login">
-            <div className="w-full bg-white p-6 rounded-lg shadow-md">
+            <div className="w-full bg-white text-black p-6 rounded-lg shadow-md">
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-semibold">Welcome back!</h2>
                 <p className="text-sm mt-2">Please enter your details</p>
@@ -228,7 +228,7 @@ const AuthPage = ({ onClose }) => {
             </div>
           </TabsContent>
           <TabsContent value="signup">
-            <div className="w-full bg-white p-6 rounded-lg shadow-md">
+            <div className="w-full bg-white text-black p-6 rounded-lg shadow-md">
               <h1 className="text-2xl font-bold mb-4 text-center">Signup</h1>
 
               {error && (
