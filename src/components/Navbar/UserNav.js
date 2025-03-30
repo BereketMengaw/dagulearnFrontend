@@ -17,7 +17,7 @@ const CreatorDropdown = () => (
   <NavigationMenu>
     <NavigationMenuList>
       <NavigationMenuItem>
-        <NavigationMenuTrigger className="hover:text-blue-500 cursive-regular">
+        <NavigationMenuTrigger className="hover:text-blue-500 cursive-regular text-1xl">
           Creator
         </NavigationMenuTrigger>
         <NavigationMenuContent>

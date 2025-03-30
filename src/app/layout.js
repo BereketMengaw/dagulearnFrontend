@@ -17,10 +17,38 @@ const geistMono = localFont({
 
 export const metadata = {
   title: "Dagulearn",
-  description:
-    "The first well organised paid course sharing platform open for anyone ",
-  icons: {
-    icon: "/favicon.ico", // or "/favicon.png"
+  keywords:
+    "dagulearn, dagu, learn, dagu learn, dagu learn app, dagu learn website",
+  authors: [
+    {
+      name: "Dagu",
+      url: "https://dagulearn.vercel.app",
+    },
+  ],
+  description: "DaguLearn is a platform for learning and sharing knowledge.",
+  creator: "Dagu",
+  publisher: "Dagu",
+  applicationName: "DaguLearn",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    title: "dagulearn",
+    description: "DaguLearn is a platform for learning and sharing knowledge.",
+    url: "dagulearn.vercel.app",
+    siteName: "DaguLearn",
+    images: [
+      {
+        url: "../../public/images/Thumbnail.jpg", // Ensure this is a full URL
+        width: 1200,
+        height: 630,
+        alt: "FOR DAGU LEARN",
+      },
+    ],
+    locale: "en-US",
+    type: "website",
   },
 };
 

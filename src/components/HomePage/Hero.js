@@ -46,7 +46,8 @@ const Hero = () => {
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-gray-300">
             Empowering educators and students to connect and share knowledge for
-            better, quality education. Learn anytime, anywhere.
+            better, quality education. <br />
+            Learn anytime, anywhere.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
