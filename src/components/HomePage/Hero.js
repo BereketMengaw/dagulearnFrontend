@@ -39,9 +39,10 @@ const Hero = () => {
 
       <div className="container mx-auto px-6 lg:px-24 relative z-10 flex flex-col lg:flex-row items-center">
         {/* Left Content */}
-        <div className="lg:w-1/2 text-center lg:text-left space-y-6">
+        <div className="lg:w-1/2 text-center lg:text-left space-y-6 ">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-snug">
-            Welcome to Dagulearn Course Sharing Platform
+            Welcome to <span className="text-purple-700">Dagulearn </span>Course
+            Sharing Platform
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-gray-300">
             Empowering educators and students to connect and share knowledge for

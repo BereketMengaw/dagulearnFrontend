@@ -40,8 +40,15 @@ const Navbar = ({ setShowAuthPopup }) => {
     <nav className="bg-white shadow sticky top-0 z-50 p-2 w-full">
       <div className="flex items-center justify-between px-4 py-2 md:px-8 ">
         {/* Logo */}
-        <div className="text-lg font-bold text-gray-800 flex-shrink-0 min-w-[100px]   cursive-regular ">
-          <Link href="/">DAGULEARN</Link>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Link href="/" className="group">
+            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent tracking-tight cursive-regular transition-all group-hover:from-purple-700 group-hover:to-blue-700">
+              DAGULEARN
+            </span>
+            <p className="text-xs text-gray-500 font-medium mt-[-4px] tracking-wide">
+              Ethiopia&lsquo;s first YouTube course monetization platform
+            </p>
+          </Link>
         </div>
 
         {/* Desktop Menu */}
