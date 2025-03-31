@@ -4,22 +4,29 @@ const Modal = ({ isOpen, onClose, videoUrl }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-lg">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4">
+      {/* Main modal container - now takes more vertical space */}
+      <div className="relative w-1/2 h-[50vh] max-w-4xl">
+        {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-700 hover:text-gray-900 text-2xl"
+          className="absolute -top-10 right-0 text-white text-2xl hover:text-gray-300 z-10"
         >
-          &times;
+          ✕
         </button>
-        <div className="relative aspect-w-16 aspect-h-9">
+
+        {/* Video container with improved vertical sizing */}
+        <div className="relative w-full h-full">
           <iframe
-            className="w-full h-64 sm:h-80 lg:h-96 rounded-lg"
-            src={videoUrl}
-            title="Introduction"
-            frameBorder="10"
+            src={`${videoUrl}?autoplay=1&mute=1&loop=1&rel=0&playsinline=1`}
+            className="absolute top-0 left-0 w-full h-full rounded-lg"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-          ></iframe>
+          />
+
+          {/* Optional overlay to make controls more visible */}
+          <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
         </div>
       </div>
     </div>
