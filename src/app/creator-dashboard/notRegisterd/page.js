@@ -119,7 +119,7 @@ const CreatorRegistrationForm = () => {
       <Navbar />
       <div className="max-w-3xl mx-auto mt-8 p-8 bg-white shadow-lg rounded-2xl border border-gray-200">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          Become an Astemari Creator 🎓
+          Become an Dagulearn Creator 🎓
         </h2>
 
         {errors.general && (
