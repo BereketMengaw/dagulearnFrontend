@@ -214,17 +214,19 @@ export default function ChapterPage() {
                   key={link.id || link.url}
                   className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow"
                 >
-                  <h3 className="text-xl font-medium text-gray-800 mb-2 ">
-                    {link.title || "Untitled Link"}
-                  </h3>
-                  <a
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 break-words"
-                  >
-                    {link.url}
-                  </a>
+               <h3 className="text-xl font-medium text-gray-800 mb-2">
+  {link.title || "Untitled Link"}
+</h3>
+
+<a
+  href={link.url}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-block px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-all duration-300 ease-in-out max-w-full overflow-hidden whitespace-nowrap text-ellipsis hover:whitespace-normal hover:overflow-visible hover:text-clip"
+>
+  {link.url}
+</a>
+
                 </div>
               ))}
             </div>
