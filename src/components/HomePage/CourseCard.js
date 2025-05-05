@@ -39,7 +39,7 @@ const CourseCard = ({ course, isTopSeller }) => {
               width={100}
               height={100}
               alt={course.title || "Course thumbnail"}
-              unoptimized
+            
             />
             {/* Top Seller Badge */}
             {isTopSeller && (
