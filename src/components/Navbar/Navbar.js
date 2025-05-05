@@ -21,8 +21,8 @@ const Navbar = ({ setShowAuthPopup }) => {
 
   // Video URLs
   const videos = {
-    student: "https://www.youtube.com/embed/lj2z4yqhkIE", // Updated embed URL
-    creator: "https://www.youtube.com/embed/lj2z4yqhkIE", // Replace with creator video ID
+    student: "https://youtu.be/cggp1iwYA4w", // Updated embed URL
+    creator: "https://youtu.be/cggp1iwYA4w", // Replace with creator video ID
   };
 
   useEffect(() => {
