@@ -7,6 +7,10 @@ const nextConfig = {
         hostname: "dagulearnbackend-production.up.railway.app",
         pathname: "/uploads/**",
       },
+      
+    ],
+    domains: [
+      'res.cloudinary.com'
     ],
   },
 };
