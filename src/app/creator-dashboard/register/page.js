@@ -186,7 +186,7 @@ const CreatorRegistrationForm = () => {
       formDataToSend.append("profilePicture", formData.profilePicture);
 
       const response = await axios.put(
-        `${apiUrl}/api/creator/creators/${creator.id}/profile-picture`,
+        `${apiUrl}/api/creator/creators/${creator.userId}/picture`,
         formDataToSend,
         {
           headers: {
