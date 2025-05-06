@@ -43,7 +43,7 @@ export default function EditCoursePage() {
       const data = await res.json();
       setCourse({
         ...data,
-        thumbnail: `${process.env.NEXT_PUBLIC_API_URL}${data.thumbnail}`,
+        thumbnail: `${data.thumbnail}`,
         creatorId: data.creatorId, // Set course creator ID
       });
     };
