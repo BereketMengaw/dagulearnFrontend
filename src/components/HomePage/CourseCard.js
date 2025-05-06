@@ -24,7 +24,7 @@ const CourseCard = ({ course, isTopSeller }) => {
   }, [course?.id]);
 
   const thumbnailUrl = course.thumbnail
-    ? `${process.env.NEXT_PUBLIC_API_URL}${course.thumbnail}`
+    ? `${course.thumbnail}`
     : "/placeholder-thumbnail.jpg";
 
   return (
