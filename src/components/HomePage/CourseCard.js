@@ -33,14 +33,15 @@ const CourseCard = ({ course, isTopSeller }) => {
         <div className="block cursor-pointer">
           {/* Thumbnail Section */}
           <div className="relative overflow-hidden rounded-t-2xl">
-            <Image
-              className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-500"
-              src={thumbnailUrl}
-              width={100}
-              height={100}
-              alt={course.title || "Course thumbnail"}
-            
-            />
+          <Image
+  className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-500"
+  src={thumbnailUrl}
+  width={800}
+  height={400}
+  alt={course.title || "Course thumbnail"}
+  quality={90}
+/>
+
             {/* Top Seller Badge */}
             {isTopSeller && (
               <div className="absolute top-2 left-2 bg-yellow-500 text-white font-bold text-xs px-3 py-1 rounded-full shadow-md">
