@@ -218,7 +218,7 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
               {creator?.profilePicture && (
                 <div className="w-48 h-48 mx-auto mb-4">
                   <img
-                    src={`${process.env.NEXT_PUBLIC_API_URL}${creator.profilePicture}`}
+                    src={`${creator.profilePicture}`}
                     alt="Profile"
                     className="w-full h-full rounded-full object-cover border-4 border-indigo-800 dark:border-blue-900 transition-transform duration-300 hover:scale-105"
                   />

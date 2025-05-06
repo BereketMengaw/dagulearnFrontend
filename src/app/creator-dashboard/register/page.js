@@ -232,7 +232,7 @@ const CreatorRegistrationForm = () => {
               <div className="flex flex-col items-center">
                 {creator.profilePicture ? (
                   <Image
-                    src={`${apiUrl}${creator.profilePicture}`}
+                    src={`${creator.profilePicture}`}
                     alt="Profile"
                     width={100}
                     height={100}
