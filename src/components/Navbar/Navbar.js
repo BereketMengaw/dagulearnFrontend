@@ -9,7 +9,7 @@ import favicon from "../../../public/favicon.png"; // Adjust the path to your fa
 import Image from "next/image";
 
 const Navbar = ({ setShowAuthPopup }) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);thu
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isAvatarDropdownOpen, setIsAvatarDropdownOpen] = useState(false);
   const [userName, setUserName] = useState("Guest");
