@@ -9,7 +9,7 @@ import favicon from "../../../public/favicon.png"; // Adjust the path to your fa
 import Image from "next/image";
 
 const Navbar = ({ setShowAuthPopup }) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);thu
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isAvatarDropdownOpen, setIsAvatarDropdownOpen] = useState(false);
   const [userName, setUserName] = useState("Guest");
@@ -21,10 +21,8 @@ const Navbar = ({ setShowAuthPopup }) => {
 
   // Video URLs
   const videos = {
-    student: "https://www.youtube.com/embed/cggp1iwYA4w
-", // Updated embed URL
-    creator: "https://www.youtube.com/embed/cggp1iwYA4w
-",
+    student: "https://www.youtube.com/embed/cggp1iwYA4w", // Updated embed URL
+    creator: "https://www.youtube.com/embed/cggp1iwYA4w",
   };
 
   useEffect(() => {
