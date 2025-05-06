@@ -26,8 +26,8 @@ export const metadata = {
     },
   ],
   description: "DaguLearn is the first platform in Ethiopia to offer YouTube course monetization, designed to facilitate learning and knowledge-sharing. It connects learners and creators by providing access to high-quality courses and resources. DaguLearn empowers creators to design, manage, and monetize their courses, while enabling learners to access engaging educational content. Whether you're looking to enhance your skills or share your expertise, DaguLearn makes learning accessible, interactive, and impactful for everyone.",
-  creator: "Dagu",
-  publisher: "Dagu",
+  creator: "DaguLearn",
+  publisher: "DaguLearn",
   applicationName: "DaguLearn",
   formatDetection: {
     email: false,
@@ -36,7 +36,7 @@ export const metadata = {
   },
   openGraph: {
     title: "dagulearn",
-    description: "DaguLearn is a platform for learning and sharing knowledge.",
+  description: "DaguLearn is the first platform in Ethiopia to offer YouTube course monetization, designed to facilitate learning and knowledge-sharing. It connects learners and creators by providing access to high-quality courses and resources. DaguLearn empowers creators to design, manage, and monetize their courses, while enabling learners to access engaging educational content. Whether you're looking to enhance your skills or share your expertise, DaguLearn makes learning accessible, interactive, and impactful for everyone.",
     url: "dagulearn.vercel.app",
     siteName: "DaguLearn",
     images: [
