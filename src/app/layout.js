@@ -21,7 +21,7 @@ export const metadata = {
     "dagulearn, dagu, learn, dagu learn, dagu learn app, dagu learn website",
   authors: [
     {
-      name: "Dagu",
+      name: "Dagu Learn",
       url: "https://dagulearn.vercel.app",
     },
   ],
