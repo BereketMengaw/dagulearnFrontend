@@ -66,7 +66,7 @@ const Navbar = ({ setShowAuthPopup }) => {
           <Link href="/" className="group">
             <div className="flex ">
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent tracking-tight cursive-regular transition-all group-hover:from-purple-700 group-hover:to-blue-700">
+                <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent tracking-tight  transition-all group-hover:from-purple-700 group-hover:to-blue-700">
                   DAGULEARN
                 </span>
                 <Image
