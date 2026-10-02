@@ -6,6 +6,7 @@ import CourseDetails from "@/components/coursePage/CourseDetails";
 import Navbar from "@/components/Navbar/Navbar";
 import AuthPopup from "@/app/auth/AuthPopup";
 import Load from "@/components/load/page";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic"; // Ensures fresh data on each request
 
@@ -26,7 +27,10 @@ export default function CoursePage({ params }) {
       }
 
       try {
-        const courseData = await fetchCourseByName(courseName);
+        // Normalise whatever encoding the route param arrives in before calling the API.
+        const courseData = await fetchCourseByName(
+          encodeURIComponent(decodeURIComponent(courseName))
+        );
         if (!courseData) {
           setError("Course not found");
           return;
@@ -45,12 +49,25 @@ export default function CoursePage({ params }) {
   }, [courseName]); // Fetch the data when the course name changes
 
   if (error) {
-    return <div className="text-center mt-10 text-red-500">{error}</div>;
+    return (
+      <div>
+        <Navbar setShowAuthPopup={setShowAuthPopup} />
+        {showAuthPopup && <AuthPopup onClose={() => setShowAuthPopup(false)} />}
+        <div className="container-page flex min-h-[60vh] flex-col items-center justify-center text-center">
+          <p className="text-2xl font-extrabold text-slate-900">{error}</p>
+          <p className="mt-2 text-slate-500">It may have been renamed or removed.</p>
+          <Link href="/#courses" className="btn-primary mt-6">
+            Browse all courses
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   if (!course || !chapters) {
     return (
       <div>
+        <Navbar setShowAuthPopup={setShowAuthPopup} />
         <Load />
       </div>
     );
@@ -70,12 +87,8 @@ export default function CoursePage({ params }) {
         chapters={chapters}
         setShowAuthPopup={setShowAuthPopup}
       />
-      {showAuthPopup && (
-        <AuthPopup
-          setShowAuthPopup={setShowAuthPopup}
-          onClose={() => setShowAuthPopup(false)}
-        />
-      )}
+      {/* Room for the mobile buy bar */}
+      <div className="h-20 lg:hidden" />
     </div>
   );
 }

@@ -1,29 +1,122 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
-import User from "./UserNav";
-import Modal from "../popupVideo/popup"; // Import the Modal component
-import favicon from "../../../public/favicon.png"; // Adjust the path to your favicon
+import { useRouter } from "next/navigation";
 import Image from "next/image";
+import {
+  Menu,
+  X,
+  Search,
+  PlayCircle,
+  ChevronDown,
+  LayoutDashboard,
+  LogOut,
+  GraduationCap,
+  Clapperboard,
+  FileText,
+  UserCog,
+} from "lucide-react";
+import Modal from "../popupVideo/popup";
+import AuthPopup, { authTabHint } from "@/app/auth/AuthPopup";
+import favicon from "../../../public/favicon.png";
+
+const videos = {
+  student: "https://www.youtube.com/embed/cggp1iwYA4w",
+  creator: "https://www.youtube.com/embed/cggp1iwYA4w",
+};
+
+// Closes a dropdown when the user clicks anywhere outside it.
+function useOutsideClose(ref, open, close) {
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) close();
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [ref, open, close]);
+}
+
+const Dropdown = ({ label, children, align = "left" }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useOutsideClose(ref, open, () => setOpen(false));
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-900"
+        aria-expanded={open}
+        aria-haspopup="true"
+      >
+        {label}
+        <ChevronDown
+          size={16}
+          className={`transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && (
+        <div
+          className={`absolute ${
+            align === "right" ? "right-0" : "left-0"
+          } mt-2 w-64 overflow-hidden rounded-2xl border border-slate-100 bg-white p-2 shadow-xl shadow-slate-900/10`}
+          onClick={() => setOpen(false)}
+        >
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const MenuItem = ({ icon: Icon, title, hint, href, onClick, danger }) => {
+  const cls = `flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left transition ${
+    danger ? "hover:bg-red-50" : "hover:bg-slate-50"
+  }`;
+  const body = (
+    <>
+      <span
+        className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+          danger ? "bg-red-50 text-red-600" : "bg-brand-50 text-brand-600"
+        }`}
+      >
+        <Icon size={16} />
+      </span>
+      <span>
+        <span
+          className={`block text-sm font-semibold ${
+            danger ? "text-red-600" : "text-slate-900"
+          }`}
+        >
+          {title}
+        </span>
+        {hint && <span className="block text-xs text-slate-500">{hint}</span>}
+      </span>
+    </>
+  );
+  return href ? (
+    <Link href={href} className={cls}>
+      {body}
+    </Link>
+  ) : (
+    <button onClick={onClick} className={cls}>
+      {body}
+    </button>
+  );
+};
 
 const Navbar = ({ setShowAuthPopup }) => {
+  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isAvatarDropdownOpen, setIsAvatarDropdownOpen] = useState(false);
   const [userName, setUserName] = useState("Guest");
   const [userData, setUserData] = useState(null);
+  const [query, setQuery] = useState("");
+  const [localAuthOpen, setLocalAuthOpen] = useState(false);
 
-  // State for the video modal
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
-
-  // Video URLs
-  const videos = {
-    student: "https://www.youtube.com/embed/cggp1iwYA4w", // Updated embed URL
-    creator: "https://www.youtube.com/embed/cggp1iwYA4w",
-  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -32,25 +125,22 @@ const Navbar = ({ setShowAuthPopup }) => {
       setUserData(parsedUser);
       setUserName(parsedUser.name || "Guest");
     }
+    const q = new URLSearchParams(window.location.search).get("q");
+    if (q) setQuery(q);
   }, []);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen((prevState) => !prevState);
-  };
-
-  const toggleDropdown = () => {
-    setIsDropdownOpen((prevState) => !prevState);
-    setIsAvatarDropdownOpen(false);
-  };
-
-  const toggleAvatarDropdown = () => {
-    setIsAvatarDropdownOpen((prevState) => !prevState);
-    setIsDropdownOpen(false);
+  // Pages that don't manage their own auth popup still get a working login button.
+  const openAuth = (tab = "login") => {
+    authTabHint.next = tab;
+    setIsMobileMenuOpen(false);
+    if (setShowAuthPopup) setShowAuthPopup(true);
+    else setLocalAuthOpen(true);
   };
 
   const openVideoModal = (videoType) => {
     setSelectedVideo(videos[videoType]);
     setIsVideoModalOpen(true);
+    setIsMobileMenuOpen(false);
   };
 
   const closeVideoModal = () => {
@@ -58,278 +148,257 @@ const Navbar = ({ setShowAuthPopup }) => {
     setSelectedVideo(null);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    setUserData(null);
+    setUserName("Guest");
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const q = query.trim();
+    setIsMobileMenuOpen(false);
+    router.push(q ? `/?q=${encodeURIComponent(q)}#courses` : "/#courses");
+  };
+
+  const initials = userName
+    .split(" ")
+    .map((p) => p[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  const isCreator = userData?.role === "creator";
+
+  const searchForm = (
+    <form onSubmit={handleSearch} className="relative w-full">
+      <Search
+        size={18}
+        className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+      />
+      <input
+        type="search"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search for courses"
+        aria-label="Search for courses"
+        className="w-full rounded-full border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-500/15"
+      />
+    </form>
+  );
+
   return (
-    <nav className="bg-white shadow sticky top-0 z-50 p-2 w-full">
-      <div className="flex items-center justify-between px-4 py-2 md:px-8 ">
+    <nav className="sticky top-0 z-40 w-full border-b border-slate-200/70 bg-white/85 backdrop-blur-lg">
+      <div className="container-page flex h-16 items-center gap-4 lg:h-[72px]">
         {/* Logo */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <Link href="/" className="group">
-            <div className="flex ">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent tracking-tight lg:cursive-regular transition-all group-hover:from-purple-700 group-hover:to-blue-700">
-                  DAGULEARN
-                </span>
-                <Image
-                  src={favicon}
-                  className="h-8 w-auto" // Adjusted to fixed height with auto width
-                  alt="DAGULEARN logo icon"
-                  width={32} // Added explicit width
-                  height={32} // Added explicit height
-                />
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 font-medium mt-[-4px] tracking-wide">
-              Ethiopia&lsquo;s first YouTube course monetization platform
-            </p>
-          </Link>
-        </div>
+        <Link href="/" className="flex shrink-0 items-center gap-2">
+          <Image
+            src={favicon}
+            className="h-8 w-8"
+            alt="DaguLearn logo"
+            width={32}
+            height={32}
+          />
+          <span className="text-xl font-extrabold tracking-tight text-slate-900">
+            Dagu<span className="text-brand-600">Learn</span>
+          </span>
+        </Link>
+
+        {/* Search (desktop) */}
+        <div className="mx-2 hidden max-w-md flex-1 md:block">{searchForm}</div>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center space-x-4">
-          {/* Learn How It Works Dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors rounded-md hover:bg-gray-50"
-              aria-expanded={isDropdownOpen}
-              aria-haspopup="true"
-            >
-              Learn How It Works ?
-              <svg
-                className={`ml-2 h-4 w-4 transition-transform ${
-                  isDropdownOpen ? "rotate-180" : ""
-                }`}
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
+        <div className="ml-auto hidden items-center gap-1 md:flex">
+          <Dropdown label="How it works">
+            <MenuItem
+              icon={GraduationCap}
+              title="For students"
+              hint="Find a course, pay with Chapa, start learning"
+              onClick={() => openVideoModal("student")}
+            />
+            <MenuItem
+              icon={Clapperboard}
+              title="For creators"
+              hint="Turn your YouTube lessons into income"
+              onClick={() => openVideoModal("creator")}
+            />
+          </Dropdown>
 
-            {/* Dropdown Content */}
-            {isDropdownOpen && (
-              <div
-                className="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg z-50 border border-gray-100"
-                onMouseLeave={() => setIsDropdownOpen(false)}
-              >
-                <button
-                  onClick={() => {
-                    openVideoModal("student");
-                    setIsDropdownOpen(false);
-                  }}
-                  className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  <svg
-                    className="mr-2 h-4 w-4 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeWidth="2"
-                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                    />
-                  </svg>
-                  For Students
-                </button>
-                <button
-                  onClick={() => {
-                    openVideoModal("creator");
-                    setIsDropdownOpen(false);
-                  }}
-                  className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  <svg
-                    className="mr-2 h-4 w-4 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeWidth="2"
-                      d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
-                    />
-                  </svg>
-                  For Creators
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Show login/signup buttons for guests */}
-          {!userData && (
-            <>
-              <div>
-                <button
-                  onClick={() => setShowAuthPopup(true)}
-                  className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
-                >
-                  <span className="relative px-5 py-1.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
-                    {" "}
-                    Login / Signup
-                  </span>
-                </button>
-              </div>
-            </>
+          {isCreator && (
+            <Dropdown label="Creator">
+              <MenuItem
+                icon={LayoutDashboard}
+                title="Creator dashboard"
+                hint="Courses, enrollments, earnings"
+                href="/creator-dashboard"
+              />
+              <MenuItem
+                icon={UserCog}
+                title="Creator info"
+                hint="Your public profile"
+                href="/creator-dashboard/register"
+              />
+              <MenuItem
+                icon={FileText}
+                title="Creator agreement"
+                href="/creator-agreement"
+              />
+            </Dropdown>
           )}
 
-          <User
-            userData={userData}
-            userName={userName}
-            setUserData={setUserData}
-            setUserName={setUserName}
-          />
+          {userData ? (
+            <Dropdown
+              align="right"
+              label={
+                <span className="flex items-center gap-2">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-xs font-bold text-white">
+                    {initials}
+                  </span>
+                  <span className="hidden max-w-[120px] truncate lg:inline">
+                    {userName}
+                  </span>
+                </span>
+              }
+            >
+              <div className="border-b border-slate-100 px-3 pb-3 pt-1">
+                <p className="truncate text-sm font-semibold text-slate-900">
+                  {userName}
+                </p>
+                <p className="truncate text-xs text-slate-500">
+                  {userData.gmail || userData.phoneNumber}
+                </p>
+              </div>
+              <div className="pt-1">
+                <MenuItem
+                  icon={PlayCircle}
+                  title="My learning"
+                  hint="Courses you've purchased"
+                  href="/dashboard"
+                />
+                <MenuItem
+                  icon={LogOut}
+                  title="Log out"
+                  onClick={handleLogout}
+                  danger
+                />
+              </div>
+            </Dropdown>
+          ) : (
+            <>
+              <button
+                onClick={() => openAuth()}
+                className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+              >
+                Log in
+              </button>
+              <button onClick={() => openAuth("signup")} className="btn-primary py-2.5">
+                Sign up
+              </button>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
         <button
-          className="md:hidden focus:outline-none p-2 rounded-md text-gray-700"
-          onClick={toggleMobileMenu}
+          className="ml-auto rounded-lg p-2 text-slate-700 hover:bg-slate-100 md:hidden"
+          onClick={() => setIsMobileMenuOpen((o) => !o)}
+          aria-label="Toggle menu"
         >
-          {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white shadow">
-          <div className="flex flex-col items-center space-y-4 py-4">
-            {/* Learn How It Works in mobile */}
-            <div className="w-full text-center">
-              <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="px-4 py-2 text-gray-700 hover:text-blue-600 bg-slate-400 rounded-md "
-              >
-                Learn How It Works ?
-              </button>
+        <div className="max-h-[calc(100vh-4rem)] overflow-y-auto border-t border-slate-100 bg-white md:hidden">
+          <div className="container-page space-y-5 py-5">
+            {searchForm}
 
-              {isDropdownOpen && (
-                <div className="flex flex-col items-center space-y-2 mt-2">
-                  <button
-                    onClick={() => openVideoModal("student")}
-                    className="px-4 py-2 text-gray-700 hover:bg-gray-100 w-full"
-                  >
-                    For Students
-                  </button>
-                  <button
-                    onClick={() => openVideoModal("creator")}
-                    className="px-4 py-2 text-gray-700 hover:bg-gray-100 w-full"
-                  >
-                    For Creators
-                  </button>
+            {userData && (
+              <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-sm font-bold text-white">
+                  {initials}
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-slate-900">
+                    {userName}
+                  </p>
+                  <p className="truncate text-xs text-slate-500">
+                    {userData.gmail || userData.phoneNumber}
+                  </p>
                 </div>
-              )}
+              </div>
+            )}
+
+            <div>
+              <p className="eyebrow mb-1 px-3">How it works</p>
+              <MenuItem
+                icon={GraduationCap}
+                title="For students"
+                onClick={() => openVideoModal("student")}
+              />
+              <MenuItem
+                icon={Clapperboard}
+                title="For creators"
+                onClick={() => openVideoModal("creator")}
+              />
             </div>
 
-            {/* Rest of the mobile menu items... */}
-            {/* Show login/signup buttons for guests */}
-            {!userData && (
-              <>
-                <button
-                  onClick={() => setShowAuthPopup(true)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-300"
-                >
-                  Login / Signup
-                </button>
-              </>
+            {isCreator && (
+              <div>
+                <p className="eyebrow mb-1 px-3">Creator</p>
+                <MenuItem
+                  icon={LayoutDashboard}
+                  title="Creator dashboard"
+                  href="/creator-dashboard"
+                />
+                <MenuItem
+                  icon={UserCog}
+                  title="Creator info"
+                  href="/creator-dashboard/register"
+                />
+                <MenuItem
+                  icon={FileText}
+                  title="Creator agreement"
+                  href="/creator-agreement"
+                />
+              </div>
             )}
 
-            {/* Show "Creator" button only for logged-in users with role "creator" */}
-            {userData && userData.role === "creator" && (
-              <>
-                <button
-                  onClick={toggleDropdown}
-                  className="hover:text-blue-500 bg-gray-500 rounded-md p-1"
-                >
-                  Creator
+            {userData ? (
+              <div>
+                <p className="eyebrow mb-1 px-3">Account</p>
+                <MenuItem icon={PlayCircle} title="My learning" href="/dashboard" />
+                <MenuItem
+                  icon={LogOut}
+                  title="Log out"
+                  onClick={handleLogout}
+                  danger
+                />
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                <button onClick={() => openAuth()} className="btn-secondary">
+                  Log in
                 </button>
-
-                {/* Creator Dropdown */}
-                {isDropdownOpen && (
-                  <div className="flex flex-col space-y-4 mt-2">
-                    <Link
-                      href="/creator-dashboard/register"
-                      className="hover:bg-gray-100 px-4 py-2 cursive-regular"
-                    >
-                      Creator Info
-                    </Link>
-                    <Link
-                      href="/creator-dashboard"
-                      className="hover:bg-gray-100 px-4 py-2 cursive-regular"
-                    >
-                      Creator Dashboard
-                    </Link>
-                    <Link
-                      href="/creator-agreement"
-                      className="hover:bg-gray-100 px-4 py-2"
-                    >
-                      Creator Agreement
-                    </Link>
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Show "Hello, [Name]" and avatar dropdown for logged-in users */}
-            {userData && (
-              <div className="relative">
-                <span className="text-gray-700 cursive-regular ">
-                  Hello, {userName}
-                </span>
-
-                <button
-                  onClick={toggleAvatarDropdown}
-                  className="focus:outline-none"
-                >
-                  <span
-                    role="img"
-                    aria-label="avatar"
-                    className="text-2xl bg-gray-200 rounded-full p-2 text-gray-800"
-                  >
-                    🧑‍🎓
-                  </span>
+                <button onClick={() => openAuth("signup")} className="btn-primary">
+                  Sign up
                 </button>
-
-                {/* Avatar Dropdown */}
-                {isAvatarDropdownOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
-                    <Link
-                      href="/dashboard"
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                    >
-                      Dashboard
-                    </Link>
-                    <button
-                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-red-600"
-                      onClick={() => {
-                        localStorage.removeItem("user");
-                        setUserData(null);
-                        setUserName("Guest");
-                      }}
-                    >
-                      Logout
-                    </button>
-                  </div>
-                )}
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* Video Modal */}
       <Modal
         isOpen={isVideoModalOpen}
         onClose={closeVideoModal}
         videoUrl={selectedVideo}
       />
+
+      {localAuthOpen && <AuthPopup onClose={() => setLocalAuthOpen(false)} />}
     </nav>
   );
 };

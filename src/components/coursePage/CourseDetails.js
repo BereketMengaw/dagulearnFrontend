@@ -2,23 +2,37 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import useCheckCreator from "@/hooks/userCheckMiddleware";
-import Image from "next/image";
+import Link from "next/link";
+import {
+  Lock,
+  PlayCircle,
+  CheckCircle2,
+  ShieldCheck,
+  Users,
+  BookOpen,
+  Infinity as InfinityIcon,
+  FileText,
+  Mail,
+  MapPin,
+  Briefcase,
+  ChevronRight,
+  Pencil,
+  Loader2,
+} from "lucide-react";
+import { fetchEnrollmentsCount } from "@/lib/fetcher";
+import { formatPrice } from "@/lib/format";
 
 export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
-  const [formData, setFormData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
-  const [buttonMessage, setButtonMessage] = useState("Buy Now Only ");
   const [errorMessage, setErrorMessage] = useState("");
   const [user, setUser] = useState(null);
-  const [userNew, setUserNew] = useState(null);
   const [name, setName] = useState(null);
   const [gmail, setgmail] = useState(null);
-  const [createId, setCreateId] = useState(null);
   const [creator, setCreator] = useState({});
   const [isAdmin, setIsAdmin] = useState(false);
   const [isCreator, setIsCreator] = useState(false);
+  const [enrollmentCount, setEnrollmentCount] = useState(null);
 
   const router = useRouter();
 
@@ -26,16 +40,10 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
   const price = course?.price;
   const realCreat = course?.creatorId;
 
-  console.log(realCreat, "this is creator id number");
-
   // Fetch user from localStorage
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedUser = JSON.parse(localStorage.getItem("user"));
-      if (storedUser) {
-        setUser(storedUser);
-      }
-    }
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) setUser(storedUser);
   }, []);
 
   // Check if user is admin or creator
@@ -46,96 +54,52 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
     }
   }, [user, course.creatorId]);
 
-  // Fetch creator details
   useEffect(() => {
-    if (!realCreat) {
-      setLoading(false);
-      return;
-    }
+    if (!courseId) return;
+    fetchEnrollmentsCount(courseId).then((d) => setEnrollmentCount(d?.enrollmentCount ?? 0));
+  }, [courseId]);
 
-    const checkCreator = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/creator/creators/${realCreat}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data.creator) {
-            setCreator(data.creator);
-          }
-        }
-      } catch (error) {
-        console.error("Error checking creator:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkCreator();
+  // Fetch creator profile
+  useEffect(() => {
+    if (!realCreat) return;
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/creator/creators/${realCreat}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => data?.creator && setCreator(data.creator))
+      .catch((error) => console.error("Error checking creator:", error));
   }, [realCreat]);
 
   // Fetch creator's basic info
   useEffect(() => {
     if (!creator?.userId) return;
-
-    const fetchCreatorInfo = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/users/${realCreat}`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch creator information");
-        }
-        const data = await response.json();
-        setUserNew(data);
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${realCreat}`)
+      .then((r) => {
+        if (!r.ok) throw new Error("Failed to fetch creator information");
+        return r.json();
+      })
+      .then((data) => {
         setgmail(data.data.gmail);
         setName(data.data.name);
-      } catch (err) {
-        setErrorMessage(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCreatorInfo();
+      })
+      .catch((err) => console.error(err));
   }, [creator?.userId, realCreat]);
 
   // Check if user is enrolled in the course
   useEffect(() => {
-    const checkEnrollment = async () => {
-      if (user && courseId) {
-        try {
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/enrollments/check/${user.userId}/${courseId}`
-          );
-          if (!response.ok) {
-          }
-          const data = await response.json();
-          setIsEnrolled(data.enrolled);
-        } catch (error) {
-          console.error("Error checking enrollment:", error);
-          setIsEnrolled(false); // Default to false if there's an error
-        }
-      }
-    };
-
-    checkEnrollment();
+    if (!user || !courseId) return;
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/enrollments/check/${user.userId}/${courseId}`)
+      .then((r) => r.json())
+      .then((data) => setIsEnrolled(data.enrolled))
+      .catch(() => setIsEnrolled(false));
   }, [courseId, user]);
+
+  const hasAccess = isAdmin || isCreator || isEnrolled;
 
   // Handle Buy Now button click
   const handleBuy = async () => {
+    setErrorMessage("");
     if (!user) {
       setShowAuthPopup(true);
-      setTimeout(() => setButtonMessage("Buy Now"), 5000);
-      return; // Exit the function early
+      return;
     }
 
     const { name, phoneNumber, userId, gmail } = user;
@@ -155,248 +119,328 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
         phoneNumber,
         txRef: transactionReference,
         callbackUrl: `${process.env.NEXT_PUBLIC_API_URL}/api/payments/callback`,
+        // Chapa sends the learner back to this course page after paying.
+        returnUrl: window.location.href,
       };
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/payments/initialize`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(paymentData),
-        }
-      );
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/payments/initialize`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(paymentData),
+      });
 
       const data = await response.json();
 
       if (data.checkoutUrl) {
-        window.open(data.checkoutUrl, "_blank");
-      } else {
-        alert("Payment initialization failed. Please try again.");
+        window.location.href = data.checkoutUrl;
+        return;
       }
+      setErrorMessage("We couldn't start the payment. Please try again.");
     } catch (error) {
       console.error("Error initiating payment:", error);
-      alert("An error occurred while processing your request.");
-    } finally {
-      setLoading(false);
+      setErrorMessage("Something went wrong while contacting Chapa. Please try again.");
     }
+    setLoading(false);
   };
 
-  // Handle chapter click
+  const canOpen = (chapter) => hasAccess || chapter.order === 1;
+
   const handleChapterClick = (chapter) => {
-    if (isAdmin || isCreator || isEnrolled || chapter.order === 1) {
+    if (canOpen(chapter)) {
       router.push(`/courses/${courseId}/chapters/${chapter.order}`);
     } else {
-      setErrorMessage(
-        "You need to purchase this course to access its chapters."
-      );
+      setErrorMessage("Buy this course to unlock every chapter.");
+      document.getElementById("purchase")?.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   };
 
-  // Handle update course button click
-  const handleUpdateCourse = () => {
-    router.push(`/courses/${courseId}/edit`);
-  };
+  const sortedChapters = [...chapters].sort((a, b) => a.order - b.order);
+  const firstChapter = sortedChapters.find((c) => c.order === 1);
+  const thumbnailUrl = course?.thumbnail || "/images/Thumbnail.jpg";
+  const creatorName = name || course.creator?.name || "DaguLearn creator";
+  const skills = creator?.skills?.split(",").map((s) => s.trim()).filter(Boolean) || [];
 
-  const thumbnailUrl = course?.thumbnail
-    ? `${course.thumbnail}`
-    : "/placeholder-thumbnail.jpg";
+  const goToChapter = (order) => router.push(`/courses/${courseId}/chapters/${order}`);
 
-  if (!course) {
-    return (
-      <p className="text-center text-red-500 font-semibold">Course not found</p>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-50 to-indigo-100 py-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* User and Creator Info Section */}
-        <div className="bg-white mb-3 dark:bg-gray-800 flex justify-center rounded-xl shadow-2xl max-w-4xl w-full p-8 transition-all duration-300 animate-fade-in">
-          <div className="flex flex-col md:flex-row">
-            {/* Profile Picture on the Left */}
-            <div className="md:w-1/3 text-center mb-8 md:mb-0">
-              {creator?.profilePicture && (
-                <div className="w-48 h-48 mx-auto mb-4">
-                  <img
-                    src={`${creator.profilePicture}`}
-                    alt="Profile"
-                    className="w-full h-full rounded-full object-cover border-4 border-indigo-800 dark:border-blue-900 transition-transform duration-300 hover:scale-105"
-                  />
-                </div>
-              )}
-              <h1 className="text-2xl font-bold text-indigo-800 dark:text-white mb-2">
-                {name}
-              </h1>
-            </div>
-
-            {/* Creator Information on the Right */}
-            <div className="md:w-2/3 md:pl-8">
-              <h2 className="text-xl font-semibold text-indigo-800 dark:text-white mb-4">
-                About Creator
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300 mb-6">
-                {creator?.bio ||
-                  "Passionate software developer with 5 years of experience in web technologies. I love creating user-friendly applications and solving complex problems."}
-              </p>
-
-              <h2 className="text-xl font-semibold text-indigo-800 dark:text-white mb-4">
-                Skills
-              </h2>
-              <div className="flex flex-wrap gap-2 mb-6">
-                {creator?.skills?.split(",").map((skill, index) => (
-                  <span
-                    key={index}
-                    className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm"
-                  >
-                    {skill.trim()}
-                  </span>
-                ))}
-              </div>
-
-              <h2 className="text-xl font-semibold text-indigo-800 dark:text-white mb-4">
-                Contact Information
-              </h2>
-              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-                <li className="flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2 text-indigo-800 dark:text-blue-900"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                  </svg>
-                  <a
-                    href={`mailto:${gmail}`}
-                    className="text-blue-600 hover:underline"
-                  >
-                    {gmail}
-                  </a>
-                </li>
-
-                <li className="flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2 text-indigo-800 dark:text-blue-900"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  {creator?.location}
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* Course Details */}
-        <div className="flex flex-col md:flex-row items-start space-y-6 md:space-y-0 md:space-x-6">
-          <img
-            className="w-full md:w-1/3 h-64 object-cover rounded-lg"
-            src={thumbnailUrl}
-            alt={course.title || "Course thumbnail"}
-          />
-          <div className="flex-grow">
-            <h1 className="text-4xl font-bold text-gray-800">{course.title}</h1>
-            <p className="text-lg text-gray-600 mt-4">{course.description}</p>
-            <div className="mt-4 space-y-2 text-sm text-gray-500">
-              <p>Creator: {course.creator?.name || "Unknown"}</p>
-              <p>Category: {course.category?.name || "Uncategorized"}</p>
-              <p>
-                Price: <span className="font-semibold">{course.price} ETB</span>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Buy Now / Ready to Learn Button */}
-        <div className="text-center mt-8">
-          {isEnrolled ? (
-            <button
-              className="rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-3 font-semibold text-white shadow-lg hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:scale-105"
-              disabled
-            >
-              You Are Ready to Learn
-            </button>
-          ) : (
-            <button
-              onClick={handleBuy}
-              className={`px-8 py-3 rounded-lg text-lg font-semibold transition ${
-                buttonMessage === "Buy Now"
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "bg-green-500 text-white"
-              }`}
-              disabled={loading}
-            >
-              {loading ? "Redirect to Chapa ..." : buttonMessage} {price} ETB
-            </button>
-          )}
-        </div>
-
-        {/* Error Message */}
-        {errorMessage && (
-          <div className="mt-4 text-center text-red-600 font-semibold">
-            {errorMessage}
-          </div>
-        )}
-
-        {/* Chapters Section */}
-        <div className="mt-10">
-          <h2 className="text-2xl font-semibold text-gray-800">Chapters</h2>
-          {chapters.length > 0 ? (
-            <ul className="mt-4 space-y-4">
-              {chapters.map((chapter, index) => (
-                <li
-                  key={chapter.id}
-                  className={`p-6 rounded-lg ${
-                    isAdmin || isCreator || isEnrolled || chapter.order === 1
-                      ? "bg-green-100 hover:bg-green-200 cursor-pointer"
-                      : "bg-gray-100 hover:bg-gray-200 cursor-not-allowed"
-                  } transition-all`}
-                  onClick={() => handleChapterClick(chapter)}
-                >
-                  <div className="flex justify-between items-center">
-                    <span
-                      className={`font-medium text-gray-800 ${
-                        !isEnrolled && chapter.order !== 1
-                          ? "text-gray-500"
-                          : ""
-                      }`}
-                    >
-                      {index + 1}. {chapter.title}
-                    </span>
-                    <span className="text-sm text-gray-500">
-                      Order: {chapter.order}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500 mt-4">
-              No chapters available for this course.
-            </p>
-          )}
-        </div>
-
-        {/* Update Course Button for Admin and Creator */}
-        {(isAdmin || isCreator) && (
-          <div className="text-center mt-8">
-            <button
-              onClick={handleUpdateCourse}
-              className="bg-yellow-500 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-yellow-600 transition"
-            >
-              Update Course
-            </button>
-          </div>
+  const PurchaseCard = () => (
+    <div
+      id="purchase"
+      className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-900/10"
+    >
+      <div className="relative aspect-video bg-slate-100">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={thumbnailUrl} alt={course.title || "Course thumbnail"} className="h-full w-full object-cover" />
+        {firstChapter && !hasAccess && (
+          <button
+            onClick={() => goToChapter(1)}
+            className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-slate-950/40 text-white transition hover:bg-slate-950/50"
+          >
+            <PlayCircle size={52} />
+            <span className="text-sm font-semibold">Preview chapter 1 free</span>
+          </button>
         )}
       </div>
+
+      <div className="p-6">
+        {hasAccess ? (
+          <>
+            <div className="flex items-center gap-2 text-emerald-700">
+              <CheckCircle2 size={20} />
+              <p className="font-bold">
+                {isEnrolled ? "You own this course" : isCreator ? "This is your course" : "Admin access"}
+              </p>
+            </div>
+            <button
+              onClick={() => goToChapter(firstChapter?.order || 1)}
+              disabled={!sortedChapters.length}
+              className="btn-primary mt-5 w-full py-3.5 text-base"
+            >
+              <PlayCircle size={18} /> Start learning
+            </button>
+          </>
+        ) : (
+          <>
+            <p className="text-3xl font-extrabold text-slate-900">{formatPrice(price)}</p>
+            <p className="mt-1 text-sm text-slate-500">One-time payment · Lifetime access</p>
+            <button
+              onClick={handleBuy}
+              disabled={loading}
+              className="btn-primary mt-5 w-full py-3.5 text-base"
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" /> Redirecting to Chapa…
+                </>
+              ) : user ? (
+                "Buy now"
+              ) : (
+                "Log in to buy"
+              )}
+            </button>
+            {firstChapter && (
+              <button onClick={() => goToChapter(1)} className="btn-secondary mt-3 w-full">
+                Preview chapter 1
+              </button>
+            )}
+          </>
+        )}
+
+        {errorMessage && (
+          <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{errorMessage}</p>
+        )}
+
+        <ul className="mt-6 space-y-3 border-t border-slate-100 pt-5 text-sm text-slate-700">
+          <li className="flex items-center gap-3">
+            <BookOpen size={17} className="text-slate-400" />
+            {sortedChapters.length} chapter{sortedChapters.length === 1 ? "" : "s"}
+          </li>
+          <li className="flex items-center gap-3">
+            <FileText size={17} className="text-slate-400" /> Videos, links and PDFs
+          </li>
+          <li className="flex items-center gap-3">
+            <InfinityIcon size={17} className="text-slate-400" /> Learn at your own pace
+          </li>
+          <li className="flex items-center gap-3">
+            <ShieldCheck size={17} className="text-emerald-500" /> Secure payment by Chapa
+          </li>
+        </ul>
+
+        {(isAdmin || isCreator) && (
+          <button
+            onClick={() => router.push(`/courses/${courseId}/edit`)}
+            className="btn-secondary mt-5 w-full"
+          >
+            <Pencil size={16} /> Update course
+          </button>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Header band */}
+      <section className="relative overflow-hidden bg-slate-950 text-white">
+        <div className="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-brand-600/30 blur-[120px]" />
+        <div className="container-page relative grid gap-10 py-10 lg:grid-cols-[1fr_380px] lg:py-14">
+          <div className="lg:pr-8">
+            <nav className="flex items-center gap-1.5 text-sm text-slate-400">
+              <Link href="/#courses" className="hover:text-white">
+                Courses
+              </Link>
+              <ChevronRight size={14} />
+              <span className="text-brand-300">{course.category?.name || "General"}</span>
+            </nav>
+            <h1 className="mt-4 text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
+              {course.title?.trim()}
+            </h1>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-300 sm:text-lg">
+              {course.description}
+            </p>
+            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-slate-300">
+              <span className="flex items-center gap-2">
+                {creator?.profilePicture ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={creator.profilePicture} alt="" className="h-8 w-8 rounded-full object-cover ring-2 ring-white/20" />
+                ) : (
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-xs font-bold">
+                    {creatorName[0]}
+                  </span>
+                )}
+                Created by <a href="#instructor" className="font-semibold text-white underline-offset-4 hover:underline">{creatorName}</a>
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Users size={16} />
+                {enrollmentCount ?? "–"} enrolled
+              </span>
+              <span className="flex items-center gap-1.5">
+                <BookOpen size={16} />
+                {sortedChapters.length} chapters
+              </span>
+            </div>
+          </div>
+
+          {/* Mobile: card sits under the header. Desktop: it floats in the sidebar below. */}
+          <div className="lg:hidden">
+            <PurchaseCard />
+          </div>
+        </div>
+      </section>
+
+      <div className="container-page grid gap-10 py-10 lg:grid-cols-[1fr_380px] lg:py-14">
+        <div className="space-y-12 lg:pr-8">
+          {/* Curriculum */}
+          <section>
+            <div className="flex items-end justify-between gap-4">
+              <h2 className="text-2xl font-extrabold tracking-tight text-slate-900">Course content</h2>
+              <p className="text-sm text-slate-500">
+                {sortedChapters.length} chapter{sortedChapters.length === 1 ? "" : "s"}
+              </p>
+            </div>
+
+            {sortedChapters.length > 0 ? (
+              <ol className="mt-5 divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200">
+                {sortedChapters.map((chapter, index) => {
+                  const open = canOpen(chapter);
+                  return (
+                    <li key={chapter.id}>
+                      <button
+                        onClick={() => handleChapterClick(chapter)}
+                        className={`flex w-full items-center gap-4 px-5 py-4 text-left transition ${
+                          open ? "hover:bg-brand-50/60" : "hover:bg-slate-50"
+                        }`}
+                      >
+                        <span
+                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                            open ? "bg-brand-100 text-brand-700" : "bg-slate-100 text-slate-500"
+                          }`}
+                        >
+                          {index + 1}
+                        </span>
+                        <span className={`flex-1 font-medium ${open ? "text-slate-900" : "text-slate-500"}`}>
+                          {chapter.title}
+                        </span>
+                        {open ? (
+                          <span className="flex items-center gap-1.5 text-sm font-semibold text-brand-700">
+                            {!hasAccess && chapter.order === 1 && (
+                              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">
+                                Free
+                              </span>
+                            )}
+                            <PlayCircle size={18} />
+                          </span>
+                        ) : (
+                          <Lock size={17} className="text-slate-400" />
+                        )}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+            ) : (
+              <p className="mt-5 rounded-2xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
+                The creator hasn&apos;t added chapters yet.
+              </p>
+            )}
+          </section>
+
+          {/* Instructor */}
+          <section id="instructor" className="scroll-mt-24">
+            <h2 className="text-2xl font-extrabold tracking-tight text-slate-900">Your instructor</h2>
+            <div className="mt-5 rounded-2xl border border-slate-200 p-6">
+              <div className="flex items-center gap-4">
+                {creator?.profilePicture ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={creator.profilePicture}
+                    alt={creatorName}
+                    className="h-20 w-20 rounded-full object-cover ring-4 ring-brand-50"
+                  />
+                ) : (
+                  <span className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-100 text-2xl font-bold text-brand-700">
+                    {creatorName[0]}
+                  </span>
+                )}
+                <div>
+                  <p className="text-lg font-bold text-slate-900">{creatorName}</p>
+                  <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500">
+                    {creator?.experience && (
+                      <span className="flex items-center gap-1.5">
+                        <Briefcase size={14} /> {creator.experience} yrs experience
+                      </span>
+                    )}
+                    {creator?.location && (
+                      <span className="flex items-center gap-1.5">
+                        <MapPin size={14} /> {creator.location}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {creator?.bio && <p className="mt-5 leading-relaxed text-slate-700">{creator.bio}</p>}
+
+              {skills.length > 0 && (
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {skills.map((skill) => (
+                    <span key={skill} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {gmail && (
+                <a
+                  href={`mailto:${gmail}`}
+                  className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 hover:underline"
+                >
+                  <Mail size={16} /> {gmail}
+                </a>
+              )}
+            </div>
+          </section>
+        </div>
+
+        {/* Desktop sticky purchase card, pulled up to overlap the header band */}
+        <aside className="hidden lg:block">
+          <div className="sticky top-24 -mt-[320px]">
+            <PurchaseCard />
+          </div>
+        </aside>
+      </div>
+
+      {/* Mobile sticky buy bar */}
+      {!hasAccess && (
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 p-3 backdrop-blur lg:hidden">
+          <div className="container-page flex items-center justify-between gap-4">
+            <p className="text-xl font-extrabold text-slate-900">{formatPrice(price)}</p>
+            <button onClick={handleBuy} disabled={loading} className="btn-primary flex-1 sm:flex-none">
+              {loading ? "Redirecting…" : user ? "Buy now" : "Log in to buy"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,18 +1,27 @@
 "use client";
 
-import React from "react";
-import CourseList from "../../components/CourseList/courseList"; // Import the CourseList component
+import React, { useState } from "react";
+import CourseList from "../../components/CourseList/courseList";
 import Navbar from "@/components/Navbar/Navbar";
+import AuthPopup from "@/app/auth/AuthPopup";
 
 const Dashboard = () => {
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
+
   return (
     <>
-      <Navbar />
-      <div className="max-w-4xl mx-auto p-6 space-y-6 bg-white shadow-md rounded-lg">
-        <h1 className="text-3xl font-bold text-gray-800">
-          My Purchased Courses
-        </h1>
-        <CourseList /> {/* Use the CourseList component here */}
+      <Navbar setShowAuthPopup={setShowAuthPopup} />
+      {showAuthPopup && <AuthPopup onClose={() => setShowAuthPopup(false)} />}
+      <div className="min-h-[70vh] bg-slate-50">
+        <div className="container-page py-10 sm:py-14">
+          <p className="eyebrow">My learning</p>
+          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            Your courses
+          </h1>
+          <div className="mt-8">
+            <CourseList onLogin={() => setShowAuthPopup(true)} />
+          </div>
+        </div>
       </div>
     </>
   );

@@ -9,6 +9,19 @@ module.exports = {
   theme: {
   	extend: {
   		colors: {
+  			brand: {
+  				50: '#f3f1ff',
+  				100: '#e9e5ff',
+  				200: '#d5ceff',
+  				300: '#b7a6ff',
+  				400: '#9474ff',
+  				500: '#7444fb',
+  				600: '#6527f0',
+  				700: '#5519d6',
+  				800: '#4716ae',
+  				900: '#3b158e',
+  				950: '#230a5f'
+  			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
@@ -51,6 +64,7 @@ module.exports = {
   			}
   		},
   		fontFamily: {
+  			sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
   			handwritten: [
   				'Delicious Handrawn"',
   				'cursive'

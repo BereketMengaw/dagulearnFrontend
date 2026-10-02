@@ -1,22 +1,17 @@
-import localFont from "next/font/local";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/footer/page";
-import Head from "next/head";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
 });
 
 export const metadata = {
-  title: "Dagulearn",
+  metadataBase: new URL("https://dagulearn.vercel.app"),
+  title: "DaguLearn — Learn from Ethiopia's best creators",
+  icons: { icon: "/favicon.ico" },
   keywords:
     "dagulearn, dagu, learn, dagu learn, dagu learn app, dagu learn website",
   authors: [
@@ -37,11 +32,11 @@ export const metadata = {
   openGraph: {
     title: "dagulearn",
   description: "DaguLearn is the first platform in Ethiopia to offer YouTube course monetization, designed to facilitate learning and knowledge-sharing. It connects learners and creators by providing access to high-quality courses and resources. DaguLearn empowers creators to design, manage, and monetize their courses, while enabling learners to access engaging educational content. Whether you're looking to enhance your skills or share your expertise, DaguLearn makes learning accessible, interactive, and impactful for everyone.",
-    url: "dagulearn.vercel.app",
+    url: "https://dagulearn.vercel.app",
     siteName: "DaguLearn",
     images: [
       {
-        url: "../../public/images/Thumbnail.jpg", // Ensure this is a full URL
+        url: "/images/Thumbnail.jpg",
         width: 1200,
         height: 630,
         alt: "FOR DAGU LEARN",
@@ -54,29 +49,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <>
-      <Head>
-        {/* Preconnect to Google Fonts and Gstatic */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-        {/* Link to Google Fonts for Delicious Handrawn */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Delicious+Handrawn&display=swap"
-          rel="stylesheet"
-        />
-
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-      </Head>
-
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          {children}
-          <Footer />
-        </body>
-      </html>
-    </>
+    <html lang="en" className={jakarta.variable}>
+      <body className="min-h-screen bg-white font-sans text-slate-900 antialiased">
+        {children}
+        <Footer />
+      </body>
+    </html>
   );
 }

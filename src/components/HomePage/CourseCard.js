@@ -1,119 +1,89 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { fetchEnrollmentsCount } from "../../lib/api";
 import Image from "next/image";
+import { Users, PlayCircle } from "lucide-react";
+import { fetchEnrollmentsCount } from "../../lib/api";
+import { formatPrice, courseHref } from "@/lib/format";
 
-const CourseCard = ({ course, isTopSeller }) => {
-  const [enrollmentCount, setEnrollmentCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+// enrollmentCount can be passed in by a parent that already fetched it;
+// otherwise the card fetches its own.
+const CourseCard = ({ course, isTopSeller, enrollmentCount: passedCount }) => {
+  const [fetchedCount, setFetchedCount] = useState(null);
 
   useEffect(() => {
-    const fetchCount = async () => {
-      try {
-        if (!course?.id) return;
-        const data = await fetchEnrollmentsCount(course.id);
-        setEnrollmentCount(data?.enrollmentCount ?? 0);
-      } catch (error) {
-        console.error("Failed to fetch enrollment count:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (passedCount !== undefined || !course?.id) return;
+    fetchEnrollmentsCount(course.id)
+      .then((data) => setFetchedCount(data?.enrollmentCount ?? 0))
+      .catch(() => setFetchedCount(0));
+  }, [course?.id, passedCount]);
 
-    fetchCount();
-  }, [course?.id]);
-
-  const thumbnailUrl = course.thumbnail
-    ? `${course.thumbnail}`
-    : "/placeholder-thumbnail.jpg";
+  const enrollmentCount = passedCount ?? fetchedCount;
+  const thumbnailUrl = course.thumbnail || "/images/Thumbnail.jpg";
+  const creatorName = course.creator?.name || "DaguLearn creator";
 
   return (
-    <div className="group relative max-w-xs mx-auto bg-white border border-gray-200 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
-      <Link href={`/${course.title}`} passHref>
-        <div className="block cursor-pointer">
-          {/* Thumbnail Section */}
-          <div className="relative overflow-hidden rounded-t-2xl">
-          <Image
-  className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-500"
-  src={thumbnailUrl}
-  width={800}
-  height={400}
-  alt={course.title || "Course thumbnail"}
-  quality={90}
-/>
+    <Link
+      href={courseHref(course)}
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl hover:shadow-slate-900/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+    >
+      <div className="relative aspect-video overflow-hidden bg-slate-100">
+        <Image
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          src={thumbnailUrl}
+          width={640}
+          height={360}
+          alt={course.title || "Course thumbnail"}
+        />
+        {isTopSeller && (
+          <span className="absolute left-3 top-3 rounded-full bg-amber-400 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-amber-950 shadow">
+            Bestseller
+          </span>
+        )}
+        <span className="absolute inset-0 flex items-center justify-center bg-slate-950/0 opacity-0 transition group-hover:bg-slate-950/30 group-hover:opacity-100">
+          <PlayCircle size={44} className="text-white drop-shadow-lg" />
+        </span>
+      </div>
 
-            {/* Top Seller Badge */}
-            {isTopSeller && (
-              <div className="absolute top-2 left-2 bg-yellow-500 text-white font-bold text-xs px-3 py-1 rounded-full shadow-md">
-                🔥 Top Seller
-              </div>
+      <div className="flex flex-1 flex-col p-4">
+        <span className="mb-2 w-fit rounded-md bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-700">
+          {course.category?.name || "General"}
+        </span>
+        <h3 className="line-clamp-2 text-base font-bold leading-snug text-slate-900 group-hover:text-brand-700">
+          {course.title?.trim()}
+        </h3>
+        <p className="mt-1 text-xs text-slate-500">{creatorName}</p>
+        <p className="mb-4 mt-2 line-clamp-2 text-sm text-slate-600">
+          {course.description}
+        </p>
+
+        <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-3">
+          <span className="text-lg font-extrabold text-slate-900">
+            {formatPrice(course.price)}
+          </span>
+          <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+            <Users size={14} />
+            {enrollmentCount == null ? (
+              <span className="inline-block h-3 w-12 animate-pulse rounded bg-slate-200" />
+            ) : (
+              `${enrollmentCount} enrolled`
             )}
-            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/60 to-transparent"></div>
-          </div>
-
-          {/* Content Section */}
-          <div className="p-5">
-            {/* Title */}
-            <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-2">
-              {course.title}
-            </h3>
-
-            {/* Description */}
-            <p className="text-sm text-gray-700 mb-3 line-clamp-2">
-              {course.description}
-            </p>
-
-            {/* Metadata */}
-            <div className="flex justify-between items-center text-xs text-gray-600 mb-3">
-              <span className="italic font-medium">
-                {course.creator?.name || "Unknown"}
-              </span>
-              <span className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-[11px]">
-                {course.category?.name || "General"}
-              </span>
-            </div>
-
-            {/* Price and Enrollment Count */}
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-blue-600 font-semibold text-base">
-                {course.price ? `${course.price} ETB` : "Free"}
-              </span>
-              <span className="text-gray-600 text-xs flex items-center gap-1">
-                {loading ? (
-                  <span className="animate-pulse">Loading...</span>
-                ) : (
-                  <>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 text-gray-500"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      />
-                    </svg>
-                    {enrollmentCount} Enrolled
-                  </>
-                )}
-              </span>
-            </div>
-
-            {/* Go to Course Button */}
-            <div className="flex justify-center">
-              <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium text-sm hover:bg-blue-700 transition-all duration-300 shadow-md hover:shadow-lg">
-                Go to Course
-              </button>
-            </div>
-          </div>
+          </span>
         </div>
-      </Link>
-    </div>
+      </div>
+    </Link>
   );
 };
+
+export const CourseCardSkeleton = () => (
+  <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+    <div className="aspect-video animate-pulse bg-slate-100" />
+    <div className="space-y-3 p-4">
+      <div className="h-4 w-20 animate-pulse rounded bg-slate-100" />
+      <div className="h-5 w-full animate-pulse rounded bg-slate-100" />
+      <div className="h-4 w-2/3 animate-pulse rounded bg-slate-100" />
+      <div className="h-6 w-24 animate-pulse rounded bg-slate-100" />
+    </div>
+  </div>
+);
 
 export default CourseCard;

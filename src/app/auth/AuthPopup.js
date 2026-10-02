@@ -3,11 +3,22 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { X } from "lucide-react"; // Import the close icon
+import { X, Eye, EyeOff, GraduationCap, Clapperboard } from "lucide-react";
+import Image from "next/image";
+import favicon from "../../../public/favicon.png";
 
 export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
+// Lets a "Sign up" button open the popup on the signup tab.
+export const authTabHint = { next: "login" };
+
 const AuthPage = ({ onClose }) => {
+  const [tab] = useState(() => {
+    const t = authTabHint.next;
+    authTabHint.next = "login";
+    return t;
+  });
+  const [submitting, setSubmitting] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -27,6 +38,8 @@ const AuthPage = ({ onClose }) => {
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
+    setSubmitting(true);
     const fullPhoneNumber = `+251${phoneNumber}`;
 
     try {
@@ -57,6 +70,8 @@ const AuthPage = ({ onClose }) => {
       }
     } catch (error) {
       setErrorMessage("Invalid phone number or password.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -89,6 +104,7 @@ const AuthPage = ({ onClose }) => {
       return;
     }
 
+    setSubmitting(true);
     try {
       const signupResponse = await axios.post(
         `${apiUrl}/api/users/create`,
@@ -132,6 +148,8 @@ const AuthPage = ({ onClose }) => {
       setError(
         err.response?.data?.message || "An error occurred. Please try again."
       );
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -140,202 +158,243 @@ const AuthPage = ({ onClose }) => {
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  const PasswordToggle = () => (
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      aria-label={showPassword ? "Hide password" : "Show password"}
+      className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 hover:text-slate-600"
+    >
+      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+    </button>
+  );
+
+  const PhoneField = ({ id, value, onChange }) => (
+    <div className="flex overflow-hidden rounded-xl border border-slate-200 bg-white transition focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-500/15">
+      <span className="flex shrink-0 items-center whitespace-nowrap border-r border-slate-200 bg-slate-50 px-3 text-sm font-medium text-slate-600">
+        🇪🇹 +251
+      </span>
+      <input
+        id={id}
+        type="tel"
+        inputMode="numeric"
+        autoComplete="tel-national"
+        placeholder="9XXXXXXXX"
+        value={value}
+        onChange={onChange}
+        className="w-full px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
+        required
+      />
+    </div>
+  );
+
+  const label = "mb-1.5 block text-sm font-medium text-slate-700";
+
   return (
-    <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg relative">
-        {/* Close Button */}
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/60 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="relative my-auto w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100 transition-colors"
+          aria-label="Close"
+          className="absolute right-4 top-4 rounded-full p-1.5 text-slate-500 transition hover:bg-slate-100"
         >
-          <X size={20} className="text-gray-600" />
+          <X size={20} />
         </button>
 
-        <Tabs defaultValue="login" className="w-[350px]">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="signup">Signup</TabsTrigger>
+        <div className="mb-6 flex flex-col items-center text-center">
+          <Image src={favicon} alt="" width={40} height={40} className="mb-3 h-10 w-10" />
+          <h2 className="text-xl font-bold text-slate-900">Welcome to DaguLearn</h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Learn from Ethiopian creators. Pay securely with Chapa.
+          </p>
+        </div>
+
+        <Tabs defaultValue={tab} className="w-full">
+          <TabsList className="grid h-11 w-full grid-cols-2 rounded-xl bg-slate-100 p-1">
+            <TabsTrigger value="login" className="rounded-lg text-sm font-semibold">
+              Log in
+            </TabsTrigger>
+            <TabsTrigger value="signup" className="rounded-lg text-sm font-semibold">
+              Sign up
+            </TabsTrigger>
           </TabsList>
-          <TabsContent value="login">
-            <div className="w-full bg-white text-black p-6 rounded-lg shadow-md">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-semibold">Welcome back!</h2>
-                <p className="text-sm mt-2">Please enter your details</p>
+
+          <TabsContent value="login" className="mt-6">
+            <form onSubmit={handleLoginSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="phoneNumber" className={label}>
+                  Phone number
+                </label>
+                {PhoneField({
+                  id: "phoneNumber",
+                  value: phoneNumber,
+                  onChange: (e) => {
+                    const input = e.target.value.replace(/\D/g, "");
+                    if (input.length <= 9) setPhoneNumber(input);
+                  },
+                })}
               </div>
 
-              <form onSubmit={handleLoginSubmit} className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="phoneNumber"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Phone Number
-                  </label>
-                  <div className="flex items-center border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500">
-                    <span className="px-3 bg-gray-100 text-gray-700 border-r border-gray-300">
-                      +251
-                    </span>
-                    <input
-                      id="phoneNumber"
-                      type="text"
-                      placeholder="9XXXXXXXX"
-                      value={phoneNumber}
-                      onChange={(e) => {
-                        const input = e.target.value.replace(/\D/g, "");
-                        if (input.length <= 9) setPhoneNumber(input);
-                      }}
-                      className="w-full px-4 py-2 focus:outline-none"
-                      required
-                    />
-                  </div>
-                </div>
-
+              <div>
+                <label htmlFor="password" className={label}>
+                  Password
+                </label>
                 <div className="relative">
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Password
-                  </label>
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="input pr-11"
                     required
                   />
-                  <span
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-3/4 transform -translate-y-1/2 cursor-pointer text-lg"
-                  >
-                    {showPassword ? "🙈" : "👁️"}
-                  </span>
+                  <PasswordToggle />
                 </div>
+              </div>
 
-                {errorMessage && (
-                  <div className="text-red-500 text-sm">{errorMessage}</div>
-                )}
+              {errorMessage && (
+                <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {errorMessage}
+                </div>
+              )}
 
-                <button
-                  type="submit"
-                  className="w-full py-2 mt-4 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md transition duration-300"
-                >
-                  Login
-                </button>
-              </form>
-            </div>
+              <button type="submit" disabled={submitting} className="btn-primary w-full">
+                {submitting ? "Logging in…" : "Log in"}
+              </button>
+            </form>
           </TabsContent>
-          <TabsContent value="signup">
-            <div className="w-full bg-white text-black p-6 rounded-lg shadow-md">
-              <h1 className="text-2xl font-bold mb-4 text-center">Signup</h1>
 
-              {error && (
-                <p className="text-red-500 mb-4 text-center">{error}</p>
-              )}
-              {success && (
-                <p className="text-green-500 mb-4 text-center">{success}</p>
-              )}
+          <TabsContent value="signup" className="mt-6">
+            {error && (
+              <div className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
+            {success && (
+              <div className="mb-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                {success}
+              </div>
+            )}
 
-              <form onSubmit={handleSignupSubmit} className="space-y-4">
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1">Role</label>
-                  <select
-                    name="role"
-                    value={formData.role}
-                    onChange={handleSignupChange}
-                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
-                  >
-                    <option value="student">Student</option>
-                    <option value="creator">Creator</option>
-                  </select>
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1">Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleSignupChange}
-                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
-                    placeholder="Enter your name"
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1">
-                    Gmail
-                  </label>
-                  <input
-                    type="email"
-                    name="gmail"
-                    autoComplete="email"
-                    value={formData.gmail}
-                    onChange={handleSignupChange}
-                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
-                    placeholder="Enter your Gmail"
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1">
-                    Phone Number
-                  </label>
-                  <div className="flex items-center border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500">
-                    <span className="px-3 bg-gray-100 text-gray-700 border-r border-gray-300">
-                      +251
-                    </span>
-                    <input
-                      type="text"
-                      name="phoneNumber"
-                      placeholder="9XXXXXXXX"
-                      value={formData.phoneNumber.replace("+251", "")} // Ensure consistent format
-                      onChange={(e) => {
-                        const input = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
-                        if (input.length <= 9) {
-                          setFormData((prevData) => ({
-                            ...prevData,
-                            phoneNumber: `+251${input}`,
-                          }));
+            <form onSubmit={handleSignupSubmit} className="space-y-4">
+              <div>
+                <span className={label}>I want to</span>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { value: "student", title: "Learn", icon: GraduationCap },
+                    { value: "creator", title: "Teach", icon: Clapperboard },
+                  ].map(({ value, title, icon: Icon }) => {
+                    const active = formData.role === value;
+                    return (
+                      <button
+                        type="button"
+                        key={value}
+                        onClick={() =>
+                          setFormData((prev) => ({ ...prev, role: value }))
                         }
-                      }}
-                      className="w-full px-4 py-2 focus:outline-none"
-                      required
-                    />
-                  </div>
+                        aria-pressed={active}
+                        className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-sm transition ${
+                          active
+                            ? "border-brand-500 bg-brand-50 text-brand-800 ring-4 ring-brand-500/10"
+                            : "border-slate-200 text-slate-700 hover:border-slate-300"
+                        }`}
+                      >
+                        <Icon size={18} className={active ? "text-brand-600" : "text-slate-400"} />
+                        <span>
+                          <span className="block font-semibold">{title}</span>
+                          <span className="block text-xs text-slate-500">
+                            {value === "student" ? "Student" : "Creator"}
+                          </span>
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
+              </div>
 
-                <div className="relative mb-4">
-                  <label className="block text-sm font-medium mb-1">
-                    Password
-                  </label>
+              <div>
+                <label htmlFor="signup-name" className={label}>
+                  Full name
+                </label>
+                <input
+                  id="signup-name"
+                  type="text"
+                  name="name"
+                  autoComplete="name"
+                  value={formData.name}
+                  onChange={handleSignupChange}
+                  className="input"
+                  placeholder="e.g. Abebe Kebede"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="signup-gmail" className={label}>
+                  Gmail
+                </label>
+                <input
+                  id="signup-gmail"
+                  type="email"
+                  name="gmail"
+                  autoComplete="email"
+                  value={formData.gmail}
+                  onChange={handleSignupChange}
+                  className="input"
+                  placeholder="you@gmail.com"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="signup-phone" className={label}>
+                  Phone number
+                </label>
+                {PhoneField({
+                  id: "signup-phone",
+                  value: formData.phoneNumber.replace("+251", ""),
+                  onChange: (e) => {
+                    const input = e.target.value.replace(/\D/g, "");
+                    if (input.length <= 9) {
+                      setFormData((prevData) => ({
+                        ...prevData,
+                        phoneNumber: `+251${input}`,
+                      }));
+                    }
+                  },
+                })}
+              </div>
+
+              <div>
+                <label htmlFor="signup-password" className={label}>
+                  Password
+                </label>
+                <div className="relative">
                   <input
+                    id="signup-password"
                     type={showPassword ? "text" : "password"}
                     name="password"
+                    autoComplete="new-password"
                     value={formData.password}
                     onChange={handleSignupChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter your password"
+                    className="input pr-11"
+                    placeholder="Create a password"
                     required
                   />
-                  <span
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-3/4 transform -translate-y-1/2 cursor-pointer text-lg"
-                  >
-                    {showPassword ? "🙈" : "👁️"}
-                  </span>
+                  <PasswordToggle />
                 </div>
+              </div>
 
-                <button
-                  type="submit"
-                  className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring focus:ring-indigo-300"
-                >
-                  Signup
-                </button>
-              </form>
-            </div>
+              <button type="submit" disabled={submitting} className="btn-primary w-full">
+                {submitting ? "Creating account…" : "Create account"}
+              </button>
+            </form>
           </TabsContent>
         </Tabs>
       </div>
