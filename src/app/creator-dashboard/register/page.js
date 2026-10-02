@@ -1,9 +1,9 @@
 "use client";
 
-import Navbar from "@/components/Navbar/Navbar";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import Load from "@/components/load/page";
+import { Pencil, Mail, Phone, MapPin, GraduationCap, Briefcase, Landmark, ArrowRight, Camera } from "lucide-react";
+import StudioShell, { Card, Field, StudioLoading, maskAccount } from "@/components/studio/StudioShell";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { registerCreator, updateCreator } from "@/lib/api";
@@ -20,6 +20,7 @@ const CreatorRegistrationForm = () => {
   const [errors, setErrors] = useState({});
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true); // Add a loading state
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     // Fetch user data from localStorage
@@ -122,9 +123,9 @@ const CreatorRegistrationForm = () => {
 
   if (loading)
     return (
-      <div>
-        <Load />
-      </div>
+      <StudioShell title="Creator profile">
+        <StudioLoading />
+      </StudioShell>
     );
 
   const handleChange = (e) => {
@@ -145,6 +146,8 @@ const CreatorRegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSuccess("");
+    setErrors({});
 
     try {
       let response;
@@ -157,7 +160,7 @@ const CreatorRegistrationForm = () => {
       }
 
       if (response.success) {
-        alert(
+        setSuccess(
           creator
             ? "Profile updated successfully!"
             : "Creator registered successfully!"
@@ -175,7 +178,7 @@ const CreatorRegistrationForm = () => {
 
   const handleUpdateProfilePicture = async () => {
     if (!formData.profilePicture) {
-      alert("Please select a file to upload.");
+      setErrors({ general: "Please select a file to upload." });
       return;
     }
 
@@ -196,7 +199,7 @@ const CreatorRegistrationForm = () => {
       );
 
       if (response.data.success) {
-        alert("Profile picture updated successfully!");
+        setSuccess("Profile picture updated successfully!");
         // Update the form data with the new profile picture URL
         setFormData((prev) => ({
           ...prev,
@@ -214,248 +217,220 @@ const CreatorRegistrationForm = () => {
     }
   };
 
+  const details = creator
+    ? [
+        { icon: Mail, label: "Email", value: userData?.gmail },
+        { icon: Phone, label: "Phone", value: userData?.phoneNumber },
+        { icon: GraduationCap, label: "Education", value: creator.educationLevel },
+        { icon: Briefcase, label: "Experience", value: creator.experience && `${creator.experience} years` },
+        { icon: MapPin, label: "Location", value: creator.location },
+        { icon: Landmark, label: "Payout account", value: `${creator.bankType || "—"} · ${maskAccount(creator.bankAccount)}` },
+      ]
+    : [];
+  const skills = creator?.skills?.split(",").map((x) => x.trim()).filter(Boolean) || [];
+
   return (
-    <>
-      <Navbar />
-      <div className="max-w-4xl mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg">
-        <h2 className="text-2xl font-bold text-center mb-6">
-          {creator ? "Your Creator Profile" : "Creator Registration"}
-        </h2>
-
-        {errors.general && (
-          <div className="text-red-500 mb-4 text-center">{errors.general}</div>
-        )}
-
-        {!isEditing && creator ? (
-          <div className="text-gray-700 space-y-4">
-            <div className="flex flex-col items-center">
-              <div className="flex flex-col items-center">
-                {creator.profilePicture ? (
-                  <Image
-                    src={`${creator.profilePicture}`}
-                    alt="Profile"
-                    width={100}
-                    height={100}
-                    className="w-32 h-32 rounded-full object-cover border border-gray-300"
-                    unoptimized
-                  />
-                ) : (
-                  <div>
-                    <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center border border-gray-300">
-                      <span className="text-gray-500 text-sm">No Image</span>
-                    </div>
-                    <div>Update your profile</div>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <p>
-                <strong>Full Name:</strong> {userData.name}
-              </p>
-              <p>
-                <strong>Phone Number:</strong> {userData.phoneNumber}
-              </p>
-              <p>
-                <strong>Email:</strong> {userData.gmail}
-              </p>
-              <p>
-                <strong>Bio:</strong> {creator.bio}
-              </p>
-              <p>
-                <strong>Education Level:</strong> {creator.educationLevel}
-              </p>
-              <p>
-                <strong>Experience:</strong> {creator.experience}
-              </p>
-              <p>
-                <strong>Skills:</strong> {creator.skills}
-              </p>
-              <p>
-                <strong>Location:</strong> {creator.location}
-              </p>
-
-              <p>
-                <strong>Bank Name:</strong> {creator.bankType}
-              </p>
-
-              <p>
-                <strong>Bank Account:</strong> {creator.bankAccount}
-              </p>
-            </div>
-
-            <button
-              onClick={() => setIsEditing(true)}
-              className="w-full mt-4 p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              Edit Profile
+    <StudioShell
+      title={creator ? "Creator profile" : "Creator registration"}
+      subtitle={
+        creator
+          ? "This is what learners see on your course pages."
+          : "Tell learners who you are and where to send your earnings."
+      }
+      actions={
+        !isEditing && creator ? (
+          <>
+            <button onClick={() => setIsEditing(true)} className="btn-secondary">
+              <Pencil size={16} /> Edit profile
             </button>
-            <div className="flex justify-center items-center mt-3">
-              <Link href="/creator-dashboard">
-                <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold rounded-lg shadow-lg hover:from-blue-700 hover:to-blue-600 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                  Go to Creator Dashboard (Join DaguLearn 🚀)
-                </button>
-              </Link>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Profile Picture Section */}
-            <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold mb-4">
-                Profile Picture (1MB MAX)
-              </h3>
-              <div className="flex flex-col items-center space-y-4">
-                {formData?.profilePicture && (
-                  <Image
-                    src={
-                      typeof formData.profilePicture === "string"
-                        ? formData.profilePicture
-                        : URL.createObjectURL(formData.profilePicture)
-                    }
-                    alt="Profile Preview"
-                    className="w-32 h-32 rounded-full object-cover border border-gray-300"
-                    width={100}
-                    height={100}
-                    unoptimized
-                  />
-                )}
-                <input
-                  type="file"
-                  onChange={handleFileChange}
-                  className="w-full p-2 border rounded-md"
-                />
-                <button
-                  type="button"
-                  onClick={handleUpdateProfilePicture}
-                  className="w-full md:w-auto px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Uploading..." : "Update Profile Picture"}
-                </button>
+            <Link href="/creator-dashboard" className="btn-primary">
+              Go to dashboard <ArrowRight size={16} />
+            </Link>
+          </>
+        ) : null
+      }
+    >
+      {errors.general && (
+        <p className="mb-6 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{errors.general}</p>
+      )}
+      {success && (
+        <p className="mb-6 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{success}</p>
+      )}
+
+      {!isEditing && creator ? (
+        <div className="grid gap-6 xl:grid-cols-[320px_1fr]">
+          <Card className="flex flex-col items-center text-center">
+            {creator.profilePicture ? (
+              <Image
+                src={`${creator.profilePicture}`}
+                alt="Profile"
+                width={128}
+                height={128}
+                className="h-32 w-32 rounded-full object-cover ring-4 ring-brand-50"
+                unoptimized
+              />
+            ) : (
+              <div className="flex h-32 w-32 items-center justify-center rounded-full bg-slate-100 text-sm text-slate-500">
+                No image
               </div>
+            )}
+            <h2 className="mt-4 text-xl font-bold text-slate-900">{userData?.name}</h2>
+            <p className="mt-1 text-sm text-slate-500">DaguLearn creator</p>
+            {!creator.profilePicture && (
+              <button onClick={() => setIsEditing(true)} className="mt-3 text-sm font-semibold text-brand-700 hover:underline">
+                Add a profile picture
+              </button>
+            )}
+          </Card>
+
+          <div className="space-y-6">
+            <Card>
+              <p className="eyebrow">About</p>
+              <p className="mt-3 leading-relaxed text-slate-700">{creator.bio || "No bio yet."}</p>
+              {skills.length > 0 && (
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {skills.map((skill) => (
+                    <span key={skill} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </Card>
+
+            <Card>
+              <p className="eyebrow">Details</p>
+              <dl className="mt-4 grid gap-5 sm:grid-cols-2">
+                {details.map(({ icon: Icon, label, value }) => (
+                  <div key={label} className="flex items-start gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                      <Icon size={16} />
+                    </span>
+                    <div className="min-w-0">
+                      <dt className="text-xs text-slate-500">{label}</dt>
+                      <dd className="truncate text-sm font-semibold text-slate-900">{value || "—"}</dd>
+                    </div>
+                  </div>
+                ))}
+              </dl>
+            </Card>
+          </div>
+        </div>
+      ) : (
+        <div className="grid gap-6 xl:grid-cols-[320px_1fr]">
+          {/* Profile Picture Section */}
+          <Card className="h-fit">
+            <h3 className="font-bold text-slate-900">Profile picture</h3>
+            <p className="mt-1 text-xs text-slate-500">JPG or PNG, 1MB max.</p>
+            <div className="mt-5 flex flex-col items-center gap-4">
+              {formData?.profilePicture ? (
+                <Image
+                  src={
+                    typeof formData.profilePicture === "string"
+                      ? formData.profilePicture
+                      : URL.createObjectURL(formData.profilePicture)
+                  }
+                  alt="Profile Preview"
+                  className="h-32 w-32 rounded-full object-cover ring-4 ring-brand-50"
+                  width={128}
+                  height={128}
+                  unoptimized
+                />
+              ) : (
+                <div className="flex h-32 w-32 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                  <Camera size={28} />
+                </div>
+              )}
+              <input
+                type="file"
+                onChange={handleFileChange}
+                className="w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-brand-700 hover:file:bg-brand-100"
+              />
+              <button
+                type="button"
+                onClick={handleUpdateProfilePicture}
+                className="btn-secondary w-full"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Uploading…" : "Update profile picture"}
+              </button>
             </div>
-            {/* Profile Information Section */}
-            <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold mb-4">
-                Profile Information
-              </h3>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <input
-                  type="text"
-                  name="name"
-                  value={formData?.name || ""}
-                  onChange={handleChange}
-                  placeholder={userData.name}
-                  className="w-full p-2 border rounded-md"
-                />
-                <input
-                  type="text"
-                  name="phoneNumber"
-                  value={userData?.phoneNumber || ""}
-                  onChange={handleChange}
-                  placeholder={userData.phoneNumber}
-                  className="w-full p-2 border rounded-md"
-                />
-                <input
-                  type="text"
-                  name="gmail"
-                  value={formData?.gmail || ""}
-                  onChange={handleChange}
-                  placeholder={userData.gmail}
-                  className="w-full p-2 border rounded-md"
-                />
-                <textarea
-                  name="bio"
-                  value={formData?.bio || ""}
-                  onChange={handleChange}
-                  placeholder="Tell us about yourself"
-                  className="w-full p-2 border rounded-md"
-                />
-                <select
-                  name="educationLevel"
-                  value={formData?.educationLevel || ""}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="">Select your education level</option>
-                  {educationLevels.map((level) => (
-                    <option key={level} value={level}>
-                      {level}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="text"
-                  name="experience"
-                  value={formData?.experience || ""}
-                  onChange={handleChange}
-                  placeholder="Experience"
-                  className="w-full p-2 border rounded-md"
-                />
-                <input
-                  type="text"
-                  name="skills"
-                  value={formData?.skills || ""}
-                  onChange={handleChange}
-                  placeholder="Skills"
-                  className="w-full p-2 border rounded-md"
-                />
-                <input
-                  type="text"
-                  name="location"
-                  value={formData?.location || ""}
-                  onChange={handleChange}
-                  placeholder="Location"
-                  className="w-full p-2 border rounded-md"
-                />
+          </Card>
 
-                {/* Social Links Input */}
+          {/* Profile Information Section */}
+          <Card>
+            <h3 className="font-bold text-slate-900">Profile information</h3>
+            <form onSubmit={handleSubmit} className="mt-5 space-y-5">
+              <div className="grid gap-5 sm:grid-cols-2">
+                <Field label="Full name" htmlFor="name">
+                  <input id="name" type="text" name="name" value={formData?.name || ""} onChange={handleChange} placeholder={userData?.name} className="input" />
+                </Field>
+                <Field label="Phone number" htmlFor="phoneNumber">
+                  <input id="phoneNumber" type="text" name="phoneNumber" value={userData?.phoneNumber || ""} onChange={handleChange} placeholder={userData?.phoneNumber} className="input bg-slate-50" />
+                </Field>
+              </div>
+              <Field label="Gmail" htmlFor="gmail">
+                <input id="gmail" type="text" name="gmail" value={formData?.gmail || ""} onChange={handleChange} placeholder={userData?.gmail} className="input" />
+              </Field>
+              <Field label="Bio" htmlFor="bio" hint="Shown on your course pages.">
+                <textarea id="bio" name="bio" rows={4} value={formData?.bio || ""} onChange={handleChange} placeholder="Tell us about yourself" className="input" />
+              </Field>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <Field label="Education level" htmlFor="educationLevel">
+                  <select id="educationLevel" name="educationLevel" value={formData?.educationLevel || ""} onChange={handleChange} className="input">
+                    <option value="">Select your education level</option>
+                    {educationLevels.map((level) => (
+                      <option key={level} value={level}>{level}</option>
+                    ))}
+                  </select>
+                </Field>
+                <Field label="Experience (years)" htmlFor="experience">
+                  <input id="experience" type="text" name="experience" value={formData?.experience || ""} onChange={handleChange} placeholder="Experience" className="input" />
+                </Field>
+              </div>
+              <Field label="Skills" htmlFor="skills" hint="Separate with commas.">
+                <input id="skills" type="text" name="skills" value={formData?.skills || ""} onChange={handleChange} placeholder="Skills" className="input" />
+              </Field>
+              <Field label="Location" htmlFor="location">
+                <input id="location" type="text" name="location" value={formData?.location || ""} onChange={handleChange} placeholder="Location" className="input" />
+              </Field>
 
-                <select
-                  name="bankType"
-                  value={formData?.bankType || ""}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="">Select your bank</option>
-                  {banksInEthiopia.map((bank) => (
-                    <option key={bank} value={bank}>
-                      {bank}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="text"
-                  name="bankAccount"
-                  value={formData?.bankAccount || ""}
-                  onChange={handleChange}
-                  placeholder="Bank Account Number"
-                  className="w-full p-2 border rounded-md"
-                />
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-sm font-semibold text-slate-900">Payout details</p>
+                <p className="mt-0.5 text-xs text-slate-500">Where your 80% share is sent each month.</p>
+                <div className="mt-4 grid gap-5 sm:grid-cols-2">
+                  <Field label="Bank" htmlFor="bankType">
+                    <select id="bankType" name="bankType" value={formData?.bankType || ""} onChange={handleChange} className="input">
+                      <option value="">Select your bank</option>
+                      {banksInEthiopia.map((bank) => (
+                        <option key={bank} value={bank}>{bank}</option>
+                      ))}
+                    </select>
+                  </Field>
+                  <Field label="Account number" htmlFor="bankAccount">
+                    <input id="bankAccount" type="text" name="bankAccount" value={formData?.bankAccount || ""} onChange={handleChange} placeholder="Bank Account Number" className="input" />
+                  </Field>
+                </div>
+              </div>
 
-                <button
-                  type="submit"
-                  className="w-full mt-4 p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Submitting..." : "Submit"}
+              <div className="flex flex-wrap gap-3 pt-2">
+                <button type="submit" className="btn-primary" disabled={isSubmitting}>
+                  {isSubmitting ? "Saving…" : "Save profile"}
                 </button>
-              </form>
-
-              {/* Bottom button with link */}
-              <div className="flex justify-center items-center  mt-3">
-                <Link href="/creator-dashboard">
-                  <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold rounded-lg shadow-lg hover:from-blue-700 hover:to-blue-600 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                    Go to Creator Dashboard
+                {creator && (
+                  <button type="button" onClick={() => setIsEditing(false)} className="btn-secondary">
+                    Cancel
                   </button>
+                )}
+                <Link href="/creator-dashboard" className="btn-secondary">
+                  Go to creator dashboard
                 </Link>
               </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </>
+            </form>
+          </Card>
+        </div>
+      )}
+    </StudioShell>
   );
 };
 

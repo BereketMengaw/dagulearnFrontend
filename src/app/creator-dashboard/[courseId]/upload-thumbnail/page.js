@@ -2,12 +2,16 @@
 
 import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { ImagePlus, Loader2, ArrowRight } from "lucide-react";
+import StudioShell, { Card } from "@/components/studio/StudioShell";
+import CourseSteps from "@/components/studio/CourseSteps";
 export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export default function UploadThumbnail() {
   const [thumbnail, setThumbnail] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [uploading, setUploading] = useState(false);
   const router = useRouter();
   const { courseId } = useParams(); // Get courseId from the URL
 
@@ -38,6 +42,7 @@ export default function UploadThumbnail() {
       return;
     }
 
+    setUploading(true);
     const formData = new FormData();
     formData.append("thumbnail", thumbnail);
 
@@ -58,60 +63,66 @@ export default function UploadThumbnail() {
       router.push(`/creator-dashboard/${courseId}/create-chapters`);
     } catch (error) {
       setErrorMessage(error.message);
+      setUploading(false);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-xl rounded-xl">
-      <h1 className="text-3xl font-bold text-gray-800 text-center mb-6">
-        Upload Course Thumbnail
-      </h1>
+    <StudioShell
+      title="Add a thumbnail"
+      subtitle="This image sells your course in the catalog. A 16:9 image works best."
+    >
+      <CourseSteps current={2} />
 
-      {errorMessage && (
-        <p className="text-center text-red-600 font-semibold mb-4">
-          {errorMessage}
-        </p>
-      )}
-
-      <form onSubmit={handleUpload} className="space-y-6">
-        <div>
-          <label
-            htmlFor="thumbnail"
-            className="block text-lg font-semibold text-gray-700 mb-2"
-          >
-            Select Thumbnail image upto 1mb(max)
-          </label>
-          <input
-            type="file"
-            id="thumbnail"
-            accept="image/*"
-            onChange={handleThumbnailChange}
-            className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Image Preview */}
-        {imagePreview && (
-          <div className="flex justify-center">
-            <div className="w-64 h-64 overflow-hidden rounded-lg shadow-md">
-              <img
-                src={imagePreview}
-                alt="Thumbnail Preview"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
+      <Card className="max-w-3xl">
+        {errorMessage && (
+          <p className="mb-5 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{errorMessage}</p>
         )}
 
-        <div className="text-center">
-          <button
-            type="submit"
-            className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-300"
+        <form onSubmit={handleUpload} className="space-y-6">
+          <label
+            htmlFor="thumbnail"
+            className="group relative flex aspect-video cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 text-center transition hover:border-brand-400 hover:bg-brand-50/40"
           >
-            Upload Thumbnail
-          </button>
-        </div>
-      </form>
-    </div>
+            {imagePreview ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={imagePreview} alt="Thumbnail preview" className="absolute inset-0 h-full w-full object-cover" />
+            ) : (
+              <>
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-brand-600 shadow-sm">
+                  <ImagePlus size={22} />
+                </span>
+                <span className="mt-3 text-sm font-semibold text-slate-900">Click to choose an image</span>
+                <span className="mt-1 text-xs text-slate-500">PNG or JPG, up to 5 MB</span>
+              </>
+            )}
+            <input
+              type="file"
+              id="thumbnail"
+              accept="image/*"
+              onChange={handleThumbnailChange}
+              className="sr-only"
+            />
+          </label>
+
+          <div className="flex items-center justify-between gap-4 border-t border-slate-100 pt-5">
+            <p className="truncate text-sm text-slate-500">
+              {thumbnail ? thumbnail.name : "No file chosen"}
+            </p>
+            <button type="submit" className="btn-primary shrink-0" disabled={uploading}>
+              {uploading ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" /> Uploading…
+                </>
+              ) : (
+                <>
+                  Upload & continue <ArrowRight size={16} />
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </Card>
+    </StudioShell>
   );
 }

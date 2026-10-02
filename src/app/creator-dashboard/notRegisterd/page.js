@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import Navbar from "../../../components/Navbar/Navbar.js";
+import StudioShell, { Card, Field } from "@/components/studio/StudioShell";
 
 const CreatorRegistrationForm = () => {
   const router = useRouter();
@@ -23,6 +23,7 @@ const CreatorRegistrationForm = () => {
   const [userId, setUserId] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true); // Add a loading state
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     // Fetch user data from localStorage
@@ -99,7 +100,7 @@ const CreatorRegistrationForm = () => {
       console.log(dataToSend, "this is data to send ");
 
       if (response.data.success) {
-        alert("Creator registration successful!");
+        setSuccess("Creator registration successful!");
         router.push("/creator-dashboard/register");
       } else {
         setErrors({
@@ -114,135 +115,118 @@ const CreatorRegistrationForm = () => {
     }
   };
 
+  const sel = (name, placeholder, options) => (
+    <select id={name} name={name} value={formData[name]} onChange={handleChange} className="input">
+      <option value="">{placeholder}</option>
+      {options.map((o) => (
+        <option key={o} value={o}>
+          {o}
+        </option>
+      ))}
+    </select>
+  );
+
   return (
-    <>
-      <Navbar />
-      <div className="max-w-3xl mx-auto mt-8 p-8 bg-white shadow-lg rounded-2xl border border-gray-200">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          Become an Dagulearn Creator 🎓
-        </h2>
+    <StudioShell
+      title="Become a DaguLearn creator"
+      subtitle="Set up your creator profile once. Learners see it on every course you publish."
+    >
+      {errors.general && (
+        <p className="mb-6 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{errors.general}</p>
+      )}
+      {success && (
+        <p className="mb-6 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{success}</p>
+      )}
 
-        {errors.general && (
-          <div className="text-red-500 mb-4 text-center">{errors.general}</div>
-        )}
-
+      <Card className="max-w-3xl">
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Profile Picture Upload */}
+          <Field label="Bio" htmlFor="bio" hint="A few sentences learners will read before buying.">
+            <textarea
+              id="bio"
+              name="bio"
+              rows={4}
+              value={formData.bio}
+              onChange={handleChange}
+              placeholder="Tell us about yourself in a few words..."
+              className="input"
+            />
+          </Field>
 
-          {/* Bio */}
-          <textarea
-            name="bio"
-            value={formData.bio}
-            onChange={handleChange}
-            placeholder="Tell us about yourself in a few words..."
-            className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-          />
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Education level" htmlFor="educationLevel">
+              {sel("educationLevel", "Select your education level", ["High School", "Bachelor", "Master", "PhD", "Other"])}
+            </Field>
+            <Field label="Years of experience" htmlFor="experience">
+              <input
+                id="experience"
+                type="number"
+                name="experience"
+                value={formData.experience}
+                onChange={handleChange}
+                placeholder="Years of experience in teaching or your field"
+                className="input"
+                min="0"
+                step="1"
+              />
+            </Field>
+          </div>
 
-          {/* Education Level */}
-          <select
-            name="educationLevel"
-            value={formData.educationLevel}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-          >
-            <option value="">Select your education level</option>
-            <option value="High School">High School</option>
-            <option value="Bachelor">Bachelor</option>
-            <option value="Master">Master</option>
-            <option value="PhD">PhD</option>
-            <option value="Other">Other</option>
-          </select>
+          <Field label="Skills" htmlFor="skills" hint="Separate with commas.">
+            <input
+              id="skills"
+              type="text"
+              name="skills"
+              value={formData.skills}
+              onChange={handleChange}
+              placeholder="What skills do you bring? (e.g., Programming, Math, Design)"
+              className="input"
+            />
+          </Field>
 
-          {/* Experience */}
-          <input
-            type="number" // Change type to "number"
-            name="experience"
-            value={formData.experience}
-            onChange={handleChange}
-            placeholder="Years of experience in teaching or your field"
-            className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-            min="0" // Optional: Set a minimum value (e.g., 0)
-            step="1" // Optional: Ensure only whole numbers are allowed
-          />
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="City" htmlFor="location">
+              {sel("location", "Select your city", ["Addis Ababa", "Dire Dawa", "Mekelle", "Bahir Dar", "Hawassa", "Gondar", "Adama", "Jimma", "Harar", "Dessie", "Shashemene"])}
+            </Field>
+            <Field label="Social or portfolio link" htmlFor="socialLinks">
+              <input
+                id="socialLinks"
+                type="text"
+                name="socialLinks"
+                value={formData.socialLinks}
+                onChange={handleChange}
+                placeholder="LinkedIn, Twitter, or portfolio link"
+                className="input"
+              />
+            </Field>
+          </div>
 
-          {/* Skills */}
-          <input
-            type="text"
-            name="skills"
-            value={formData.skills}
-            onChange={handleChange}
-            placeholder="What skills do you bring? (e.g., Programming, Math, Design)"
-            className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-          />
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <p className="text-sm font-semibold text-slate-900">Payout details</p>
+            <p className="mt-0.5 text-xs text-slate-500">Where your 80% share is sent each month.</p>
+            <div className="mt-4 grid gap-5 sm:grid-cols-2">
+              <Field label="Bank" htmlFor="bankType">
+                {sel("bankType", "Choose your bank", ["Awash Bank", "Commercial Bank of Ethiopia", "Dashen Bank", "Bank of Abyssinia"])}
+              </Field>
+              <Field label="Account number" htmlFor="bankAccount">
+                <input
+                  id="bankAccount"
+                  type="text"
+                  name="bankAccount"
+                  value={formData.bankAccount}
+                  onChange={handleChange}
+                  placeholder="e.g. 100012345678"
+                  className="input"
+                />
+              </Field>
+            </div>
+          </div>
 
-          {/* Location */}
-          <select
-            name="location"
-            value={formData.location}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-          >
-            <option value="">Select your city</option>
-            <option value="Addis Ababa">Addis Ababa</option>
-            <option value="Dire Dawa">Dire Dawa</option>
-            <option value="Mekelle">Mekelle</option>
-            <option value="Bahir Dar">Bahir Dar</option>
-            <option value="Hawassa">Hawassa</option>
-            <option value="Gondar">Gondar</option>
-            <option value="Adama">Adama</option>
-            <option value="Jimma">Jimma</option>
-            <option value="Harar">Harar</option>
-            <option value="Dessie">Dessie</option>
-            <option value="Shashemene">Shashemene</option>
-          </select>
-
-          {/* Social Links */}
-          <input
-            type="text"
-            name="socialLinks"
-            value={formData.socialLinks}
-            onChange={handleChange}
-            placeholder="Drop your LinkedIn, Twitter, or portfolio link"
-            className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-          />
-
-          {/* Bank Selection */}
-          <select
-            name="bankType"
-            value={formData.bankType}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-          >
-            <option value="">Choose your bank</option>
-            <option value="Awash Bank">Awash Bank</option>
-            <option value="Commercial Bank of Ethiopia">
-              Commercial Bank of Ethiopia
-            </option>
-            <option value="Dashen Bank">Dashen Bank</option>
-            <option value="Bank of Abyssinia">Bank of Abyssinia</option>
-          </select>
-
-          {/* Bank Account */}
-          <input
-            type="text"
-            name="bankAccount"
-            value={formData.bankAccount}
-            onChange={handleChange}
-            placeholder="Enter your bank account number (e.g., 100012345678)"
-            className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-          />
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full p-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all duration-200 disabled:opacity-50"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Submitting..." : "Update Profile"}
+          <button type="submit" className="btn-primary w-full sm:w-auto" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting…" : "Create creator profile"}
           </button>
         </form>
-      </div>
-    </>
+      </Card>
+    </StudioShell>
   );
 };
 

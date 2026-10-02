@@ -2,14 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar/Navbar";
+import StudioShell, { Card, StudioLoading } from "@/components/studio/StudioShell";
+import { BookOpen, Pencil, ListPlus, Image as ImageIcon, PlusCircle } from "lucide-react";
+import { formatPrice, courseHref } from "@/lib/format";
 import {
   fetchCoursesByCreator,
   fetchCreator,
   fetchCourseByChapterId,
 } from "@/lib/fetcher";
 export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import useCheckCreator from "@/hooks/userCheckMiddleware"; // ✅ Import the middleware
 
@@ -59,7 +60,6 @@ const MyCourses = () => {
   useEffect(() => {
     // If creator check is done and user is not a creator or no creator data, redirect
     if (!checkingCreator && (creator === false || creator === null)) {
-      alert("First fill creator information.");
       router.push(
         `${process.env.NEXT_PUBLIC_APP_URL}/creator-dashboard/register`
       );
@@ -84,109 +84,110 @@ const MyCourses = () => {
     loadCourses();
   }, [creatorId, userId]); // Add 'userId' as a dependency
 
+  const thumbSrc = (t) =>
+    !t ? null : t.startsWith("http") ? t : `${process.env.NEXT_PUBLIC_API_URL}${t}`;
+
   return (
-    <>
-      <Navbar />
-      <div className="min-h-screen bg-gray-100 p-6">
-        <div className="w-full max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-3xl font-semibold text-gray-800 mb-6">
-            📚 My Courses
-          </h2>
-
-          {loading ? (
-            <p className="text-gray-600">Loading courses...</p>
-          ) : courses.length > 0 ? (
-            <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {courses.map((course) => {
-                const thumbnailUrl = course.thumbnail
-                  ? `${process.env.NEXT_PUBLIC_API_URL}${course.thumbnail}`
-                  : null;
-
-                return (
-                  <li
-                    key={course.id}
-                    className="p-4 bg-gray-50 rounded-lg shadow-sm border transition-transform transform hover:scale-105"
-                  >
-                    {/* Course Link */}
-                    <Link href={`/${course.title}`}>
-                      <div className="cursor-pointer">
-                        {/* Thumbnail */}
-                        {thumbnailUrl ? (
-                          <Image
-                            src={thumbnailUrl}
-                            alt={course.title}
-                            height={100}
-                            width={100}
-                            className="w-full h-40 object-cover rounded-md mb-4"
-                          />
-                        ) : (
-                          <div className="w-full h-40 bg-gray-200 flex items-center justify-center text-gray-500">
-                            No Image Available
-                          </div>
-                        )}
-
-                        {/* Course Details */}
-                        <h3 className="text-xl font-semibold text-gray-800">
-                          {course.title}
-                        </h3>
-                        <p className="text-gray-600 mt-2">
-                          {course.description}
-                        </p>
-                        <span className="block text-gray-700 font-medium mt-2">
-                          Category: {course.category?.name}
-                        </span>
-                        <span className="block text-green-600 font-bold mt-2">
-                          Price: {course.price} ETB
-                        </span>
+    <StudioShell
+      title="My courses"
+      subtitle="Every course you've published, with quick links to edit it."
+      actions={
+        <Link href="/creator-dashboard/create-course" className="btn-primary">
+          <PlusCircle size={16} /> New course
+        </Link>
+      }
+    >
+      {loading ? (
+        <StudioLoading />
+      ) : courses.length > 0 ? (
+        <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          {courses.map((course) => {
+            const thumbnailUrl = thumbSrc(course.thumbnail);
+            return (
+              <li
+                key={course.id}
+                className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white"
+              >
+                <Link href={courseHref(course)} className="group block">
+                  <div className="aspect-video overflow-hidden bg-slate-100">
+                    {thumbnailUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={thumbnailUrl}
+                        alt={course.title}
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-sm text-slate-400">
+                        <ImageIcon size={18} className="mr-2" /> No thumbnail yet
                       </div>
-                    </Link>
+                    )}
+                  </div>
+                  <div className="p-5 pb-3">
+                    {course.category?.name && (
+                      <span className="rounded-md bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-700">
+                        {course.category.name}
+                      </span>
+                    )}
+                    <h3 className="mt-2 line-clamp-2 font-bold text-slate-900 group-hover:text-brand-700">
+                      {course.title?.trim()}
+                    </h3>
+                    <p className="mt-1 line-clamp-2 text-sm text-slate-600">{course.description}</p>
+                    <p className="mt-3 text-lg font-extrabold text-slate-900">
+                      {formatPrice(course.price)}
+                    </p>
+                  </div>
+                </Link>
+                <div className="mt-auto grid grid-cols-3 border-t border-slate-100 text-xs font-semibold text-slate-600">
+                  <Link
+                    href={`/courses/${course.id}/edit`}
+                    className="flex items-center justify-center gap-1.5 py-3 hover:bg-slate-50 hover:text-brand-700"
+                  >
+                    <Pencil size={14} /> Edit
+                  </Link>
+                  <Link
+                    href={`/creator-dashboard/${course.id}/create-chapters`}
+                    className="flex items-center justify-center gap-1.5 border-x border-slate-100 py-3 hover:bg-slate-50 hover:text-brand-700"
+                  >
+                    <ListPlus size={14} /> Chapters
+                  </Link>
+                  <Link
+                    href={`/creator-dashboard/${course.id}/upload-thumbnail`}
+                    className="flex items-center justify-center gap-1.5 py-3 hover:bg-slate-50 hover:text-brand-700"
+                  >
+                    <ImageIcon size={14} /> Thumbnail
+                  </Link>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <Card className="flex flex-col items-center py-14 text-center">
+          <BookOpen size={36} className="text-slate-400" />
+          <p className="mt-3 font-semibold text-slate-900">No courses yet</p>
+          <p className="mt-1 text-sm text-slate-500">Start by creating your first course.</p>
+          <Link href="/creator-dashboard/create-course" className="btn-primary mt-5">
+            Create a course
+          </Link>
+        </Card>
+      )}
 
-                    {/* Fetch Course by Chapter Button */}
-                  </li>
-                );
-              })}
-            </ul>
+      {(chapterCourse || noChaptersMessage) && (
+        <Card className="mt-8">
+          {chapterCourse ? (
+            <>
+              <h3 className="font-bold text-slate-900">Course details</h3>
+              <p className="mt-2 text-slate-600">{chapterCourse.description}</p>
+              <p className="mt-2 text-sm text-slate-500">Category: {chapterCourse.category?.name}</p>
+              <p className="mt-1 font-bold text-slate-900">{formatPrice(chapterCourse.price)}</p>
+            </>
           ) : (
-            <p className="text-gray-600">
-              No courses available. Start by creating one!
-            </p>
+            <p className="text-center font-medium text-red-600">{noChaptersMessage}</p>
           )}
-
-          {/* Display Fetched Course by Chapter or Backup Message */}
-          <div className="mt-8 p-4 bg-gray-50 rounded-lg shadow">
-            {chapterCourse ? (
-              <>
-                <h3 className="text-2xl font-semibold text-gray-800">
-                  📖 Course Details (Fetched by Chapter)
-                </h3>
-                <p className="text-gray-600 mt-2">
-                  {chapterCourse.description}
-                </p>
-                <span className="block text-gray-700 font-medium mt-2">
-                  Category: {chapterCourse.category?.name}
-                </span>
-                <span className="block text-green-600 font-bold mt-2">
-                  Price: {chapterCourse.price} ETB
-                </span>
-              </>
-            ) : (
-              noChaptersMessage && (
-                <p className="text-red-600 font-medium text-center">
-                  {noChaptersMessage}
-                </p>
-              )
-            )}
-          </div>
-
-          <button
-            onClick={() => router.push("/creator-dashboard")}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition"
-          >
-            Back to Dashboard
-          </button>
-        </div>
-      </div>
-    </>
+        </Card>
+      )}
+    </StudioShell>
   );
 };
 

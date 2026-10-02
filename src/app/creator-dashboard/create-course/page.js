@@ -1,10 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar/Navbar";
+import StudioShell, { Card, Field, StudioLoading } from "@/components/studio/StudioShell";
+import CourseSteps from "@/components/studio/CourseSteps";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { fetchCategories } from "@/lib/fetcher";
 import useCheckCreator from "@/hooks/userCheckMiddleware"; // ✅ Import the middleware
-import Load from "@/components/load/page";
 
 export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -42,7 +43,6 @@ export default function CourseCreate() {
 
   useEffect(() => {
     if (!checkingCreator && (creator === false || creator === null)) {
-      alert("First fill creator information.");
       router.push(
         `${process.env.NEXT_PUBLIC_APP_URL}/creator-dashboard/register`
       );
@@ -123,134 +123,116 @@ export default function CourseCreate() {
 
   if (checkingCreator) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Load />
-      </div>
+      <StudioShell title="Create a course">
+        <StudioLoading />
+      </StudioShell>
     );
   }
 
   return (
-    <>
-      <Navbar />
-      <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8 bg-gradient-to-r from-blue-50 to-indigo-100 shadow-2xl rounded-xl space-y-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 text-center cursive-regular">
-          Create a New Course
-        </h1>
+    <StudioShell
+      title="Create a course"
+      subtitle="Start with the basics. You'll add a thumbnail and chapters next."
+    >
+      <CourseSteps current={1} />
 
-        {errorMessage && (
-          <p className="text-center text-red-600 font-semibold">
-            {errorMessage}
-          </p>
-        )}
+      <div className="grid gap-6 xl:grid-cols-[1fr_300px]">
+        <Card>
+          {errorMessage && (
+            <p className="mb-5 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{errorMessage}</p>
+          )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Course Title */}
-          <div>
-            <label
-              htmlFor="title"
-              className="block text-lg font-semibold text-gray-700 mb-2 cursive-regular"
-            >
-              Course Title
-            </label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={courseData.title}
-              onChange={handleChange}
-              required
-              className="bg-gray-50 borde text-blue-800 text-sm rounded-lg  focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-              placeholder="Enter course title"
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <Field label="Course title" htmlFor="title" hint="Learners see this first. Keep it clear and specific.">
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={courseData.title}
+                onChange={handleChange}
+                required
+                className="input"
+                placeholder="e.g. Full-Stack Web Dev with Next.js"
+              />
+            </Field>
 
-          {/* Course Description */}
-          <div>
-            <label
-              htmlFor="description"
-              className="block text-lg font-semibold text-gray-700 mb-2"
-            >
-              Course Description
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              value={courseData.description}
-              onChange={handleChange}
-              required
-              rows="5"
-              className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 transition duration-200"
-              placeholder="Enter course description"
-            ></textarea>
-          </div>
+            <Field label="Description" htmlFor="description">
+              <textarea
+                id="description"
+                name="description"
+                value={courseData.description}
+                onChange={handleChange}
+                required
+                rows="5"
+                className="input"
+                placeholder="What will learners be able to do after this course?"
+              ></textarea>
+            </Field>
 
-          {/* Price */}
-          <div>
-            <label
-              htmlFor="price"
-              className="block text-lg font-semibold text-gray-700 mb-2"
-            >
-              Course Price (ETB)
-            </label>
-            <input
-              type="number"
-              id="price"
-              name="price"
-              value={courseData.price}
-              onChange={handleChange}
-              required
-              className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 transition duration-200"
-              placeholder="Enter course price"
-            />
-          </div>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Price (ETB)" htmlFor="price">
+                <input
+                  type="number"
+                  id="price"
+                  name="price"
+                  value={courseData.price}
+                  onChange={handleChange}
+                  required
+                  className="input"
+                  placeholder="e.g. 350"
+                />
+              </Field>
 
-          {/* Category Dropdown */}
-          <div>
-            <label
-              htmlFor="categoryId"
-              className="block text-lg font-semibold text-gray-700 mb-2"
-            >
-              Category
-            </label>
-            <select
-              id="categoryId"
-              name="categoryId"
-              value={courseData.categoryId}
-              onChange={handleChange}
-              required
-              className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 transition duration-200"
-            >
-              <option value="" disabled>
-                Select a category
-              </option>
-              {categories.length > 0 ? (
-                categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
+              <Field label="Category" htmlFor="categoryId">
+                <select
+                  id="categoryId"
+                  name="categoryId"
+                  value={courseData.categoryId}
+                  onChange={handleChange}
+                  required
+                  className="input"
+                >
+                  <option value="" disabled>
+                    Select a category
                   </option>
-                ))
-              ) : (
-                <option disabled>Loading categories...</option>
-              )}
-            </select>
-          </div>
+                  {categories.length > 0 ? (
+                    categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>Loading categories...</option>
+                  )}
+                </select>
+              </Field>
+            </div>
 
-          {/* Submit Button */}
-          <div className="text-center">
-            <button
-              type="submit"
-              className={`px-8 py-3 rounded-lg text-lg font-semibold transition duration-200 ${
-                loading
-                  ? "bg-gray-600 text-white cursor-not-allowed"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
-              }`}
-              disabled={loading}
-            >
-              {loading ? "Creating a course ..." : "Create Course"}
-            </button>
-          </div>
-        </form>
+            <div className="flex justify-end border-t border-slate-100 pt-5">
+              <button type="submit" className="btn-primary" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" /> Creating course…
+                  </>
+                ) : (
+                  <>
+                    Create course <ArrowRight size={16} />
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </Card>
+
+        <Card className="h-fit bg-brand-50/50">
+          <p className="eyebrow">Tips</p>
+          <ul className="mt-3 space-y-3 text-sm text-slate-600">
+            <li>Chapter 1 is free for everyone, so make it a strong preview.</li>
+            <li>You keep 80% of every sale; DaguLearn keeps 20%.</li>
+            <li>Videos stay on YouTube. You&apos;ll paste their links per chapter.</li>
+          </ul>
+        </Card>
       </div>
-    </>
+    </StudioShell>
   );
 }

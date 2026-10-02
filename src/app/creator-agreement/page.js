@@ -1,17 +1,16 @@
-import Navbar from "@/components/Navbar/Navbar";
+import { Wallet } from "lucide-react";
+import StudioShell, { Card } from "@/components/studio/StudioShell";
 
 export default function CreatorAgreementPage() {
   return (
-    <>
-      <Navbar />
-      <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg">
-          <h1 className="text-3xl font-bold text-center text-blue-600 mb-8">
-            Creator Agreement
-          </h1>
-
+    <StudioShell
+      title="Creator agreement"
+      subtitle="The terms between DaguLearn and the creators who teach on it."
+    >
+      <div className="grid gap-6 xl:grid-cols-[1fr_260px]">
+        <Card className="sm:p-10">
           {/* Agreement Terms */}
-          <div className="space-y-6 text-gray-700">
+          <div className="max-w-3xl space-y-4 leading-relaxed text-slate-700 [&_h2]:mt-8 [&_h2]:border-t [&_h2]:border-slate-100 [&_h2]:pt-8 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-slate-900 [&_h2:first-child]:mt-0 [&_h2:first-child]:border-0 [&_h2:first-child]:pt-0 [&_h3]:mt-5 [&_h3]:font-semibold [&_h3]:text-slate-900 [&_li]:mt-1.5 [&_li]:marker:text-brand-500 [&_strong]:text-slate-900">
             <h2 className="text-xl font-semibold">Introduction</h2>
             <p>
               This Creator Agreement is entered into between Dagulearn and the
@@ -95,7 +94,7 @@ export default function CreatorAgreementPage() {
             <p>
               Either party may terminate this Agreement at any time with written
               notice. Upon termination, the Platform will remove the
-              Creator&quot;s content, and any outstanding payments will be
+              Creator&apos;s content, and any outstanding payments will be
               settled within 30 days.
             </p>
 
@@ -106,8 +105,26 @@ export default function CreatorAgreementPage() {
               of the Platform constitutes acceptance of the updated terms.
             </p>
           </div>
-        </div>
+        </Card>
+
+        <aside className="space-y-4 xl:sticky xl:top-24 xl:self-start">
+          <Card>
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+              <Wallet size={20} />
+            </span>
+            <p className="mt-4 text-3xl font-extrabold text-slate-900">80 / 20</p>
+            <p className="mt-1 text-sm text-slate-500">
+              You keep 80% of every sale. DaguLearn keeps 20% to run the platform.
+            </p>
+          </Card>
+          <Card>
+            <p className="text-sm font-semibold text-slate-900">Payouts</p>
+            <p className="mt-1 text-sm text-slate-500">
+              Paid to your bank account at the end of each month.
+            </p>
+          </Card>
+        </aside>
       </div>
-    </>
+    </StudioShell>
   );
 }

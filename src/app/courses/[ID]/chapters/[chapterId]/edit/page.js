@@ -1,14 +1,23 @@
 "use client";
 
-//to check git
-
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import {
+  Eye,
+  Plus,
+  Save,
+  Trash2,
+  Video,
+  Link2,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
 import { fetchContentByChapterAndCourse } from "@/lib/fetcher";
-import Navbar from "@/components/Navbar/Navbar";
 import { apiUrl } from "@/lib/api";
-import { appUrl } from "@/app/creator-dashboard/register/page";
-import Load from "@/components/load/page";
+import StudioShell, { Card, Field, StudioLoading } from "@/components/studio/StudioShell";
+
+const dangerBtn =
+  "inline-flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 transition hover:bg-red-100";
 
 export default function UpdateChapterPage() {
   const params = useParams();
@@ -22,10 +31,16 @@ export default function UpdateChapterPage() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [status, setStatus] = useState(null); // { type: "success" | "error", text }
 
   const [user, setUser] = useState(null);
   const [courseCreatorId, setCourseCreatorId] = useState(null);
   const [chapterOrder, setChapterOrder] = useState(null);
+
+  const notify = (type, text) => {
+    setStatus({ type, text });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   useEffect(() => {
     if (!courseId || !chapterId) return;
@@ -106,8 +121,9 @@ export default function UpdateChapterPage() {
         ...prevContent,
         videos: prevContent.videos.filter((video) => video.id !== videoId),
       }));
+      notify("success", "Video deleted.");
     } catch (err) {
-      alert("Error deleting video");
+      notify("error", "Error deleting video.");
     }
   };
 
@@ -124,8 +140,9 @@ export default function UpdateChapterPage() {
         ...prevContent,
         links: prevContent.links.filter((link) => link.id !== linkId),
       }));
+      notify("success", "Link deleted.");
     } catch (err) {
-      alert("Error deleting link");
+      notify("error", "Error deleting link.");
     }
   };
 
@@ -140,11 +157,10 @@ export default function UpdateChapterPage() {
         }
       );
 
-      alert("chapter title updated succussfully ");
-
       if (!response.ok) throw new Error("Failed to update chapter.");
+      notify("success", "Chapter title updated.");
     } catch (err) {
-      alert("Error updating chapter");
+      notify("error", "Error updating chapter.");
     }
   };
 
@@ -155,10 +171,10 @@ export default function UpdateChapterPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: updatedTitle, url: updatedUrl }),
       });
-      alert("you have successfully updated the video");
       if (!response.ok) throw new Error("Failed to update video.");
+      notify("success", "Video updated.");
     } catch (err) {
-      alert("Error updating video");
+      notify("error", "Error updating video.");
     }
   };
 
@@ -170,161 +186,206 @@ export default function UpdateChapterPage() {
         body: JSON.stringify({ title: updatedTitle, url: updatedUrl }),
       });
 
-      alert("you have successfully updated the link");
       if (!response.ok) throw new Error("Failed to update link.");
+      notify("success", "Link updated.");
     } catch (err) {
-      alert("Error updating link");
+      notify("error", "Error updating link.");
     }
   };
 
   const handleNavigateToAddChapter = () => {
-    router.push(`${appUrl}/creator-dashboard/${courseId}/create-chapters`);
+    router.push(`/creator-dashboard/${courseId}/create-chapters`);
   };
 
-  if (loading)
+  const updateVideoField = (id, field, value) =>
+    setContent((prev) => ({
+      ...prev,
+      videos: prev.videos.map((v) => (v.id === id ? { ...v, [field]: value } : v)),
+    }));
+
+  const updateLinkField = (id, field, value) =>
+    setContent((prev) => ({
+      ...prev,
+      links: prev.links.map((l) => (l.id === id ? { ...l, [field]: value } : l)),
+    }));
+
+  const actions = (
+    <>
+      <button onClick={handleNavigateToAddChapter} className="btn-secondary">
+        <Plus size={16} /> Add chapters, videos &amp; links
+      </button>
+      <button
+        onClick={() => router.push(`/courses/${courseId}/chapters/${chapterId}`)}
+        className="btn-primary"
+      >
+        <Eye size={16} /> Check chapter
+      </button>
+    </>
+  );
+
+  if (loading) {
     return (
-      <div>
-        <Load />
-      </div>
+      <StudioShell title="Edit chapter">
+        <StudioLoading />
+      </StudioShell>
     );
-  if (error) return <p className="text-red-500">{error}</p>;
+  }
+
+  if (error) {
+    return (
+      <StudioShell title="Edit chapter">
+        <div className="rounded-2xl border border-red-100 bg-red-50 p-8 text-center font-semibold text-red-700">
+          {error}
+        </div>
+      </StudioShell>
+    );
+  }
 
   return (
-    <>
-      <Navbar />
-      <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold mb-4">Update Chapter {courseId}</h1>
-
-        {/* Update Chapter Title */}
-        <div className="mb-6">
-          <label className="block text-lg font-medium mb-2">
-            Chapter Title:
-          </label>
-          <input
-            type="text"
-            value={content.title}
-            onChange={(e) => setContent({ ...content, title: e.target.value })}
-            className="w-full p-2 border rounded-md"
-          />
-          <button
-            onClick={handleUpdateChapter}
-            className="mt-2 p-2 bg-blue-600 text-white rounded-md"
-          >
-            Update Chapter
-          </button>
+    <StudioShell
+      title={`Edit chapter ${chapterOrder ?? chapterId}`}
+      subtitle="Update the title, videos and links learners see in this chapter."
+      actions={actions}
+    >
+      {status && (
+        <div
+          className={`mb-6 flex items-center gap-2 rounded-xl px-4 py-3 text-sm ${
+            status.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"
+          }`}
+        >
+          {status.type === "success" ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+          {status.text}
         </div>
+      )}
 
-        {/* Update Videos */}
-        <h2 className="text-xl font-semibold mt-6">Videos</h2>
-        {content.videos.map((video) => (
-          <div key={video.id} className="mb-4 p-4 border rounded-md bg-gray-50">
-            <label className="block text-md font-medium">Video Title:</label>
+      <div className="space-y-6">
+        {/* Chapter title */}
+        <Card>
+          <h2 className="font-bold text-slate-900">Chapter title</h2>
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
             <input
               type="text"
-              value={video.title}
-              onChange={(e) => {
-                const updatedVideos = content.videos.map((v) =>
-                  v.id === video.id ? { ...v, title: e.target.value } : v
-                );
-                setContent({ ...content, videos: updatedVideos });
-              }}
-              className="w-full p-2 border rounded-md mb-2"
+              aria-label="Chapter title"
+              value={content.title}
+              onChange={(e) => setContent({ ...content, title: e.target.value })}
+              className="input flex-1"
             />
-
-            <label className="block text-md font-medium">Video URL:</label>
-            <input
-              type="text"
-              value={video.url}
-              onChange={(e) => {
-                const updatedVideos = content.videos.map((v) =>
-                  v.id === video.id ? { ...v, url: e.target.value } : v
-                );
-                setContent({ ...content, videos: updatedVideos });
-              }}
-              className="w-full p-2 border rounded-md"
-            />
-
-            <button
-              onClick={() =>
-                handleUpdateVideo(video.id, video.title, video.url)
-              }
-              className="mt-2 p-2 bg-green-600 text-white rounded-md mx-12"
-            >
-              Update Video
-            </button>
-
-            <button
-              onClick={() => handleDeleteVideo(video.id)}
-              className="p-2 bg-red-600 text-white rounded-md mx-12"
-            >
-              Delete Video
+            <button onClick={handleUpdateChapter} className="btn-primary shrink-0">
+              <Save size={16} /> Update chapter
             </button>
           </div>
-        ))}
+        </Card>
 
-        {/* Update Links */}
-        <h2 className="text-xl font-semibold my-6">Links</h2>
-        {content.links.map((link) => (
-          <div key={link.id} className="mb-4 p-4 border rounded-md bg-gray-50">
-            <label className="block text-md font-medium">Link Title:</label>
-            <input
-              type="text"
-              value={link.title}
-              onChange={(e) => {
-                const updatedLinks = content.links.map((l) =>
-                  l.id === link.id ? { ...l, title: e.target.value } : l
-                );
-                setContent({ ...content, links: updatedLinks });
-              }}
-              className="w-full p-2 border rounded-md mb-2"
-            />
-
-            <label className="block text-md font-medium">Link URL:</label>
-            <input
-              type="text"
-              value={link.url}
-              onChange={(e) => {
-                const updatedLinks = content.links.map((l) =>
-                  l.id === link.id ? { ...l, url: e.target.value } : l
-                );
-                setContent({ ...content, links: updatedLinks });
-              }}
-              className="w-full p-2 border rounded-md"
-            />
-
-            <button
-              onClick={() => handleUpdateLink(link.id, link.title, link.url)}
-              className="mt-2 p-2 bg-yellow-600 text-white rounded-md mx-10"
-            >
-              Update Link
-            </button>
-
-            <button
-              onClick={() => handleDeleteLink(link.id)}
-              className="p-2 bg-red-600 text-white rounded-md"
-            >
-              Delete Link
-            </button>
+        {/* Videos */}
+        <Card>
+          <div className="flex items-center gap-2">
+            <Video size={18} className="text-brand-600" />
+            <h2 className="font-bold text-slate-900">Videos</h2>
+            <span className="text-sm text-slate-500">({content.videos.length})</span>
           </div>
-        ))}
-        <button
-          onClick={handleNavigateToAddChapter}
-          className="mb-6 p-2 bg-purple-600 text-white rounded-md"
-        >
-          Add New Chapter , Videos and Links
-        </button>
-      </div>
+          {content.videos.length === 0 ? (
+            <p className="mt-4 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
+              No videos in this chapter yet.
+            </p>
+          ) : (
+            <div className="mt-4 space-y-4">
+              {content.videos.map((video, i) => (
+                <div key={video.id} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    Video {i + 1}
+                  </p>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <Field label="Video title" htmlFor={`video-title-${video.id}`}>
+                      <input
+                        id={`video-title-${video.id}`}
+                        type="text"
+                        value={video.title}
+                        onChange={(e) => updateVideoField(video.id, "title", e.target.value)}
+                        className="input"
+                      />
+                    </Field>
+                    <Field label="YouTube URL" htmlFor={`video-url-${video.id}`}>
+                      <input
+                        id={`video-url-${video.id}`}
+                        type="text"
+                        value={video.url}
+                        onChange={(e) => updateVideoField(video.id, "url", e.target.value)}
+                        className="input"
+                      />
+                    </Field>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <button
+                      onClick={() => handleUpdateVideo(video.id, video.title, video.url)}
+                      className="btn-primary py-2.5"
+                    >
+                      <Save size={16} /> Update video
+                    </button>
+                    <button onClick={() => handleDeleteVideo(video.id)} className={dangerBtn}>
+                      <Trash2 size={16} /> Delete video
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
 
-      <div className="flex justify-center p-23">
-        <button
-          onClick={() =>
-            router.push(`${appUrl}/courses/${courseId}/chapters/${chapterId}`)
-          }
-          className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 my-7 px-6 rounded-lg transition"
-        >
-          Check Chapter
-        </button>
+        {/* Links */}
+        <Card>
+          <div className="flex items-center gap-2">
+            <Link2 size={18} className="text-brand-600" />
+            <h2 className="font-bold text-slate-900">Links</h2>
+            <span className="text-sm text-slate-500">({content.links.length})</span>
+          </div>
+          {content.links.length === 0 ? (
+            <p className="mt-4 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
+              No links in this chapter yet.
+            </p>
+          ) : (
+            <div className="mt-4 space-y-4">
+              {content.links.map((link, i) => (
+                <div key={link.id} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    Link {i + 1}
+                  </p>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <Field label="Link title" htmlFor={`link-title-${link.id}`}>
+                      <input
+                        id={`link-title-${link.id}`}
+                        type="text"
+                        value={link.title}
+                        onChange={(e) => updateLinkField(link.id, "title", e.target.value)}
+                        className="input"
+                      />
+                    </Field>
+                    <Field label="Link URL" htmlFor={`link-url-${link.id}`}>
+                      <input
+                        id={`link-url-${link.id}`}
+                        type="text"
+                        value={link.url}
+                        onChange={(e) => updateLinkField(link.id, "url", e.target.value)}
+                        className="input"
+                      />
+                    </Field>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <button
+                      onClick={() => handleUpdateLink(link.id, link.title, link.url)}
+                      className="btn-primary py-2.5"
+                    >
+                      <Save size={16} /> Update link
+                    </button>
+                    <button onClick={() => handleDeleteLink(link.id)} className={dangerBtn}>
+                      <Trash2 size={16} /> Delete link
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
       </div>
-    </>
+    </StudioShell>
   );
 }

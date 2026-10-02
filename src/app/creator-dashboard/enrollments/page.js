@@ -1,19 +1,10 @@
 "use client";
 
-import Navbar from "@/components/Navbar/Navbar";
 import { useEffect, useState } from "react";
-import { ClipLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
-import Load from "@/components/load/page";
-import {
-  Table,
-  TableCaption,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table"; // Import the table components
+import Link from "next/link";
+import { Users, Wallet, BookOpen, ArrowLeft } from "lucide-react";
+import StudioShell, { Card, StudioLoading } from "@/components/studio/StudioShell";
 
 export const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 import useCheckCreator from "@/hooks/userCheckMiddleware"; // ✅ Import the middleware
@@ -27,6 +18,7 @@ export default function EnrollmentsPage() {
   const [totalEarnings, setTotalEarnings] = useState(0);
   const [userData, setUserData] = useState(null);
   const router = useRouter();
+  const [notice, setNotice] = useState("");
 
   useEffect(() => {
     // Only access localStorage on the client-side
@@ -56,10 +48,8 @@ export default function EnrollmentsPage() {
   useEffect(() => {
     // If creator check is done and user is not a creator or no creator data, redirect
     if (!checkingCreator && (creator === false || creator === null)) {
-      alert("First fill creator information.");
-      router.push(
-        "${process.env.NEXT_PUBLIC_APP_URL}/creator-dashboard/register"
-      );
+      setNotice("First fill in your creator information.");
+      router.push("/creator-dashboard/register");
     }
   }, [checkingCreator, creator, router]);
 
@@ -130,118 +120,117 @@ export default function EnrollmentsPage() {
     fetchEnrollments();
   }, [courses]);
 
-  if (loading)
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Load />
-      </div>
-    );
+  const totalStudents = enrollments.reduce((n, e) => n + e.enrollments.length, 0);
 
-  if (error)
-    return (
-      <>
-        <Navbar />
-        <div className="flex justify-center items-center h-screen">
-          <p className="bg-red-100 text-red-700 p-4 rounded-lg">
-            Error: {error}
-          </p>
-        </div>
-        <div className="flex justify-center">
-          <button
-            onClick={() =>
-              router.push(
-                `${process.env.NEXT_PUBLIC_APP_URL}/api/creator-dashboard`
-              )
-            }
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition"
-          >
-            Return to Dashboard
-          </button>
-        </div>
-      </>
-    );
+  const stats = [
+    { label: "Courses", value: courses.length, icon: BookOpen },
+    { label: "Total enrollments", value: totalStudents, icon: Users },
+    { label: "Gross sales", value: `${totalEarnings.toLocaleString()} ETB`, icon: Wallet },
+  ];
 
   return (
-    <>
-      <Navbar />
-      <div className="max-w-4xl mx-auto bg-gradient-to-br from-blue-50 to-white rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold mb-6 text-gray-800 mx-10">
-          My Course Enrollments
-        </h1>
-        <div className="space-y-8">
+    <StudioShell
+      title="Enrollments"
+      subtitle="Who has bought each of your courses."
+      actions={
+        <Link href="/creator-dashboard" className="btn-secondary">
+          <ArrowLeft size={16} /> Back to overview
+        </Link>
+      }
+    >
+      {notice && (
+        <p className="mb-6 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">{notice}</p>
+      )}
+
+      {loading ? (
+        <StudioLoading />
+      ) : error ? (
+        <Card className="text-center">
+          <p className="font-semibold text-red-700">Error: {error}</p>
+          <button onClick={() => router.push("/creator-dashboard")} className="btn-secondary mt-4">
+            Return to dashboard
+          </button>
+        </Card>
+      ) : (
+        <div className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-3">
+            {stats.map(({ label, value, icon: Icon }) => (
+              <Card key={label} className="flex items-center gap-4">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                  <Icon size={20} />
+                </span>
+                <div>
+                  <p className="text-sm text-slate-500">{label}</p>
+                  <p className="text-2xl font-extrabold text-slate-900">{value}</p>
+                </div>
+              </Card>
+            ))}
+          </div>
+
           {courses.length === 0 ? (
-            <p className="text-gray-500">No courses found.</p>
+            <Card className="text-center text-slate-500">No courses found.</Card>
           ) : (
             courses.map((course) => {
               const courseEnrollments =
-                enrollments.find((e) => e.course.id === course.id)
-                  ?.enrollments || [];
+                enrollments.find((e) => e.course.id === course.id)?.enrollments || [];
               const courseEarnings = courseEnrollments.reduce(
-                (sum, enrollment) =>
-                  sum + parseFloat(enrollment.course.price || 0),
+                (sum, enrollment) => sum + parseFloat(enrollment.course.price || 0),
                 0
               );
 
               return (
-                <div
-                  key={course.id}
-                  className="bg-white p-6 rounded-lg shadow-md space-y-4"
-                >
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    Course Title: {course.title}
-                  </h2>
-                  <p className="text-gray-600">{course.description}</p>
-                  <Table>
-                    <TableCaption>
-                      A list of your recent enrollments.
-                    </TableCaption>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>User ID</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Enrolled At</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {courseEnrollments.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan="3">
-                            No enrollments found for this course.
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        courseEnrollments.map((enrollment) => (
-                          <TableRow key={enrollment.id}>
-                            <TableCell>{enrollment.userId}</TableCell>
-                            <TableCell>{enrollment.course.price} ETB</TableCell>
-                            <TableCell>
-                              {new Date(enrollment.createdAt).toLocaleString()}
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
-                
-                </div>
+                <Card key={course.id} className="p-0">
+                  <div className="flex flex-col gap-2 border-b border-slate-100 p-6 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <h2 className="text-lg font-bold text-slate-900">{course.title?.trim()}</h2>
+                      <p className="mt-1 line-clamp-2 text-sm text-slate-500">{course.description}</p>
+                    </div>
+                    <div className="flex shrink-0 gap-2 text-xs font-semibold">
+                      <span className="rounded-full bg-brand-50 px-3 py-1 text-brand-700">
+                        {courseEnrollments.length} enrolled
+                      </span>
+                      <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">
+                        {courseEarnings.toLocaleString()} ETB
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+                        <tr>
+                          <th className="px-6 py-3 font-semibold">Student ID</th>
+                          <th className="px-6 py-3 font-semibold">Price</th>
+                          <th className="px-6 py-3 font-semibold">Enrolled at</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {courseEnrollments.length === 0 ? (
+                          <tr>
+                            <td colSpan="3" className="px-6 py-6 text-center text-slate-500">
+                              No enrollments for this course yet.
+                            </td>
+                          </tr>
+                        ) : (
+                          courseEnrollments.map((enrollment) => (
+                            <tr key={enrollment.id} className="hover:bg-slate-50">
+                              <td className="px-6 py-3 font-medium text-slate-900">#{enrollment.userId}</td>
+                              <td className="px-6 py-3 text-slate-700">{enrollment.course.price} ETB</td>
+                              <td className="px-6 py-3 text-slate-500">
+                                {new Date(enrollment.createdAt).toLocaleString()}
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
               );
             })
           )}
-          <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-            <div className="text-lg font-bold text-blue-800">
-              Total Earnings from All Courses: {totalEarnings} ETB
-            </div>
-          </div>
         </div>
-        <div className="mt-10 flex justify-center">
-          <button
-            onClick={() => router.push("/creator-dashboard")}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition"
-          >
-            Return to Dashboard
-          </button>
-        </div>
-      </div>
-    </>
+      )}
+    </StudioShell>
   );
 }
