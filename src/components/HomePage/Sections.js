@@ -149,8 +149,7 @@ export const CreatorCTA = ({ user, onAuth }) => {
   return (
     <section className="bg-white py-16 sm:py-24">
       <div className="container-page">
-        <div className="relative overflow-hidden rounded-3xl bg-slate-950 px-6 py-12 text-white sm:px-12 sm:py-16">
-          <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-brand-600/40 blur-[100px]" />
+        <div className="relative overflow-hidden rounded-3xl bg-neutral-900 px-6 py-12 text-white sm:px-12 sm:py-16">
           <div className="relative grid items-center gap-10 lg:grid-cols-[1.4fr_1fr]">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-300">

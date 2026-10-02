@@ -260,8 +260,7 @@ export default function CourseDetails({ course, chapters, setShowAuthPopup }) {
   return (
     <div className="min-h-screen bg-white">
       {/* Header band */}
-      <section className="relative overflow-hidden bg-slate-950 text-white">
-        <div className="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-brand-600/30 blur-[120px]" />
+      <section className="relative overflow-hidden bg-neutral-900 text-white">
         <div className="container-page relative grid gap-10 py-10 lg:grid-cols-[1fr_380px] lg:py-14">
           <div className="lg:pr-8">
             <nav className="flex items-center gap-1.5 text-sm text-slate-400">
